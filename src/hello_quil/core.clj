@@ -19,6 +19,8 @@
   (q/color-mode :hsb)
                                         ; setup function returns initial state. It contains
                                         ; circle color and position.
+  (q/text-font (q/create-font "Hack" 28 true))
+
   {:circle-anim {:color 0
                  :angle 0
                  :last-time (t/now) }})
@@ -47,9 +49,27 @@
                                         ; Draw the circle.
       (q/ellipse x y 100 100))))
 
+(defn draw-text
+  [state]
+
+  (let [text-color [128 128 128]]
+
+    ;; Note that the border (the stroke) is centered on the point where
+    ;; the shape is anchored.
+    (q/fill text-color)
+
+    (q/text "heppas"
+            100
+            100)))
+
 
 (defn draw-state [state]
   (q/background 240)
+  (q/stroke-weight 2)
+
+  ;; TODO: make a system of text drawing.
+  (draw-text state)
+
   (draw-circle (:circle-anim state)))
 
 
