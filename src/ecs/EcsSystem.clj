@@ -8,9 +8,10 @@
   (s/keys :req-un [::name]))
 
 
+;; Doesn't seem to be accessible from 'core'
 (def sample-system {:name "test-ecs-system"})
 
-;;(s/valid? ::system data)
+;;(s/valid? ::system sample-system)
 ;;(s/explain ::system data )
 
 

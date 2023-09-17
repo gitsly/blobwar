@@ -1,7 +1,10 @@
 (ns hello-quil.core
   (:require [quil.core :as q]
             [quil.middleware :as m]
-            [clj-time [core :as t]]))
+            ;;            [ecs.ecssystem :refer :all]
+            [ecs.ecssystem :as ecs]
+            [clj-time [core :as t]]
+            [clojure.spec.alpha :as s]))
 
 (comment
   (let [start-time (t/now)]
@@ -9,7 +12,8 @@
     (t/in-millis (t/interval start-time (t/now))))
   )
 
-
+;;(s/explain :ecs.ecssystem/system :ecs.ecssystem/sample-system)
+(s/explain ::ecs/system {:name 1})
 
 
 (defn setup []
@@ -21,7 +25,8 @@
                                         ; circle color and position.
   (q/text-font (q/create-font "Hack" 28 true))
 
-  {:circle-anim {:color 0
+  {:last-time (t/now)
+   :circle-anim {:color 0
                  :angle 0
                  :last-time (t/now) }})
 
