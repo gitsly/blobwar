@@ -15,14 +15,8 @@
     (t/in-millis (t/interval start-time (t/now))))
   )
 
-
-(
- {:apa 12 :name "heppas"}) 4
-
 ;;(s/explain ::ecs/system ecs/sample-system)
 ;;(s/explain ::ecs/system (:definition (Drawing. {:name "name1"})))
-
-
 
 (defn setup []
   (q/frame-rate 30)
@@ -42,7 +36,10 @@
 (defn update-state [state]
   (let [now (t/now)
         dt (t/in-millis (t/interval (:last-time state) now))]
-    (update-in state [:circle-anim] update-circle)))
+    (-> state
+        (assoc :dt dt)
+        (assoc :last-time now)
+        (update-in  [:circle-anim] update-circle))))
 
 (defn draw-circle
   [state]
@@ -81,7 +78,7 @@
 
 (q/defsketch hello-quil
   :title "Quil ECS testing"
-  :size [500 500]
+  :size [640 480]
                                         ; setup function called only once, during sketch initialization.
   :setup setup
                                         ; update-state is called on each iteration before draw-state.
