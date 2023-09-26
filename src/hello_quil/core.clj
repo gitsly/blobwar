@@ -4,16 +4,18 @@
             ;;            [ecs.ecssystem :refer :all]
             [ecs.ecssystem :as ecs]
             [drawing.quildrawing :as quildrawing]
+            [drawing.dbgview :as dbgview]
             [clj-time [core :as t]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [zprint.core :as zp]))
 
+
+
 (comment
   (let [start-time (t/now)]
     ... do lots of work ...
-    (t/in-millis (t/interval start-time (t/now))))
-  )
+    (t/in-millis (t/interval start-time (t/now)))))
 
 ;;(s/explain ::ecs/system ecs/sample-system)
 ;;(s/explain ::ecs/system (:definition (Drawing. {:name "name1"})))
@@ -24,22 +26,23 @@
   (q/text-font (q/create-font "Hack" 12 true))
 
   {:last-time (t/now)
-   :systems [(quildrawing/drawing "DrawingSys1")]
+   :systems [(quildrawing/drawing "DrawingSys1")
+             (dbgview/->Drawing "Debug text drawing system")]
    :circle-anim {:color 0
                  :angle 0 }})
 
 (defn update-circle
-  [state]
-  {:color (mod (+ (:color state) 0.7) 255)
-   :angle (+ (:angle state) 0.02) })
+[state]
+{:color (mod (+ (:color state) 0.7) 255)
+ :angle (+ (:angle state) 0.02) })
 
 (defn update-state [state]
-  (let [now (t/now)
-        dt (t/in-millis (t/interval (:last-time state) now))]
-    (-> state
-        (assoc :dt dt)
-        (assoc :last-time now)
-        (update-in  [:circle-anim] update-circle))))
+(let [now (t/now)
+      dt (t/in-millis (t/interval (:last-time state) now))]
+  (-> state
+      (assoc :dt dt)
+      (assoc :last-time now)
+      (update-in  [:circle-anim] update-circle))))
 
 (defn draw-circle
   [state]
@@ -54,38 +57,46 @@
                                         ; Draw the circle.
       (q/ellipse x y 100 100))))
 
-(defn draw-text
-  [state]
-  (let [text-color [128 128 128]
-        text-formatting-width 32
-        text-content (zp/zprint-str state text-formatting-width)]
-    ;; Note that the border (the stroke) is centered on the point where
-    ;; the shape is anchored.
-    (q/fill text-color)
-    (q/text text-content
-            10
-            10)))
+
+(ecs/update
+ (quildrawing/->Drawing "DrawingSys1") {:start 4})
+
+(ecs/test
+ (quildrawing/->Drawing "DrawingSys1") )
+
+(loop [v 4]
+  (println v)
+  (if (zero? v) 
+    nil
+    (recur (dec v))))
+
+(loop [sys [(quildrawing/drawing "DrawingSys1")]
+       state {:counter 0}]
+  (zp/zprint (first sys) 12)
+  (if (empty? sys) 
+    state
+    (recur (rest sys) (ecs/update (first sys) state))))
 
 
 (defn draw-state [state]
   (q/background 240)
   (q/stroke-weight 2)
   ;; TODO: make a system of text drawing.
-  (draw-text state)
+                                        ;  (draw-text state)
 
   (draw-circle (:circle-anim state)))
 
 
 (q/defsketch hello-quil
-  :title "Quil ECS testing"
-  :size [640 480]
+:title "Quil ECS testing"
+:size [640 480]
                                         ; setup function called only once, during sketch initialization.
-  :setup setup
+:setup setup
                                         ; update-state is called on each iteration before draw-state.
-  :update update-state
-  :draw draw-state
-  :features [:keep-on-top]
+:update update-state
+:draw draw-state
+:features [:keep-on-top]
                                         ; This sketch uses functional-mode middleware.
                                         ; Check quil wiki for more info about middlewares and particularly
                                         ; fun-mode.
-  :middleware [m/fun-mode])
+:middleware [m/fun-mode])
