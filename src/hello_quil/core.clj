@@ -34,18 +34,20 @@
 (defn update-circle
   [state]
   {:color (mod (+ (:color state) 0.7) 255)
-   :angle (+ (:angle state) 0.02) })
+   :angle (+ (:angle state) 0.01) })
 
 
-(defn update-state-via-systems 
+(defn do-systems 
+  "Calls fn over a set of systems, Assuming EcsSystem realizing"
   [state
-   systems]
+   systems
+   fn]
   (loop [systems systems
          state state]
     (if (empty? systems) 
       state
       (recur (rest systems)
-             (ecs/update (first systems) state) ; Let each 'system' update the state
+             (fn (first systems) state) ; Let each 'system' update the state
              ))))
 
 
@@ -55,7 +57,7 @@
     (-> state
         (assoc :dt dt)
         (assoc :last-time now)
-        (update-state-via-systems (:systems state))
+        (do-systems  (:systems state) ecs/update)
         (update-in  [:circle-anim] update-circle))))
 
 (defn draw-circle
@@ -64,12 +66,22 @@
                                         ; Calculate x and y coordinates of the circle.
   (let [angle (:angle state)
         x (* 150 (q/cos angle))
-        y (* 150 (q/sin angle))]
+        y (* 150 (q/sin angle))
+        sz (* 200 (q/sin angle))]
                                         ; Move origin point to the center of the sketch.
+
     (q/with-translation [(/ (q/width) 2)
                          (/ (q/height) 2)]
                                         ; Draw the circle.
-      (q/ellipse x y 100 100))))
+      (q/ellipse x y 100 100))
+
+    (q/with-translation [(+ 120 (/ (q/width) 2))
+                         (/ (q/height) 2)]
+                                        ; Draw the circle.
+      (q/ellipse x y sz 200))
+
+
+    ))
 
 
 ;;(ecs/update (dbgview/->Drawing "Debug text drawing system") )
@@ -79,6 +91,8 @@
 ;; [(quildrawing/drawing "DrawingSys1")
 ;;  (dbgview/->Drawing "Debug text drawing system")])
 
+;;(ecs/draw 
+;; (quildrawing/->Drawing "Debug text drawing system") {})
 
 (defn draw-state [state]
   (q/background 240)
@@ -86,15 +100,12 @@
   ;; TODO: make a system of text drawing.
                                         ;  (draw-text state)
   ;;  (update-state-via-systems ) 
+  (do-systems state (:systems state) ecs/draw)
 
-  (draw-circle (:circle-anim state))
-
-  )
-
+  (draw-circle (:circle-anim state)))
 
 (q/defsketch hello-quil
-
-  :title "Quil ECS testing"
+  :title (str "Blob" " " "War")
   :size [640 480]
                                         ; setup function called only once, during sketch initialization.
   :setup setup

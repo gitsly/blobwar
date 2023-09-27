@@ -9,8 +9,8 @@
 (defrecord Drawing[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
   (update [_ state]
-    (println "quil-drawing")
-    state))
+    state)
+  (draw [_ state] state))
 
 ;; TODO: function can be generalized by passing in ::spec as well.
 (defn drawing
