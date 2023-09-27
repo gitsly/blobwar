@@ -32,17 +32,31 @@
                  :angle 0 }})
 
 (defn update-circle
-[state]
-{:color (mod (+ (:color state) 0.7) 255)
- :angle (+ (:angle state) 0.02) })
+  [state]
+  {:color (mod (+ (:color state) 0.7) 255)
+   :angle (+ (:angle state) 0.02) })
+
+
+(defn update-state-via-systems 
+  [state
+   systems]
+  (loop [systems systems
+         state state]
+    (if (empty? systems) 
+      state
+      (recur (rest systems)
+             (ecs/update (first systems) state) ; Let each 'system' update the state
+             ))))
+
 
 (defn update-state [state]
-(let [now (t/now)
-      dt (t/in-millis (t/interval (:last-time state) now))]
-  (-> state
-      (assoc :dt dt)
-      (assoc :last-time now)
-      (update-in  [:circle-anim] update-circle))))
+  (let [now (t/now)
+        dt (t/in-millis (t/interval (:last-time state) now))]
+    (-> state
+        (assoc :dt dt)
+        (assoc :last-time now)
+        (update-state-via-systems (:systems state))
+        (update-in  [:circle-anim] update-circle))))
 
 (defn draw-circle
   [state]
@@ -60,21 +74,10 @@
 
 ;;(ecs/update (dbgview/->Drawing "Debug text drawing system") )
 
-(defn update-state-via-systems 
-  [state
-   systems]
-  (loop [systems systems
-         state state]
-    (if (empty? systems) 
-      state
-      (recur (rest systems)
-             (ecs/update (first systems) state) ; Let each 'system' update the state
-             ))))
-
-(update-state-via-systems 
- {:counter 0}
- [(quildrawing/drawing "DrawingSys1")
-  (dbgview/->Drawing "Debug text drawing system")])
+;;(update-state-via-systems 
+;; {:counter 0}
+;; [(quildrawing/drawing "DrawingSys1")
+;;  (dbgview/->Drawing "Debug text drawing system")])
 
 
 (defn draw-state [state]
@@ -82,20 +85,24 @@
   (q/stroke-weight 2)
   ;; TODO: make a system of text drawing.
                                         ;  (draw-text state)
+  ;;  (update-state-via-systems ) 
 
-  (draw-circle (:circle-anim state)))
+  (draw-circle (:circle-anim state))
+
+  )
 
 
 (q/defsketch hello-quil
-:title "Quil ECS testing"
-:size [640 480]
+
+  :title "Quil ECS testing"
+  :size [640 480]
                                         ; setup function called only once, during sketch initialization.
-:setup setup
+  :setup setup
                                         ; update-state is called on each iteration before draw-state.
-:update update-state
-:draw draw-state
-:features [:keep-on-top]
+  :update update-state
+  :draw draw-state
+  :features [:keep-on-top]
                                         ; This sketch uses functional-mode middleware.
                                         ; Check quil wiki for more info about middlewares and particularly
                                         ; fun-mode.
-:middleware [m/fun-mode])
+  :middleware [m/fun-mode])
