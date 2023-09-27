@@ -60,17 +60,21 @@
 
 ;;(ecs/update (dbgview/->Drawing "Debug text drawing system") )
 
-(loop [sys [(quildrawing/drawing "DrawingSys1")
-            (dbgview/->Drawing "Debug text drawing system")]
-       state {:counter 0}]
-  (if (empty? sys) 
-    state
-    (recur (rest sys)
-           (ecs/update (first sys) state) ; Let each 'system' update the state
-           )))
+(defn update-state-via-systems 
+  [state
+   systems]
+  (loop [systems systems
+         state state]
+    (if (empty? systems) 
+      state
+      (recur (rest systems)
+             (ecs/update (first systems) state) ; Let each 'system' update the state
+             ))))
 
-
-
+(update-state-via-systems 
+ {:counter 0}
+ [(quildrawing/drawing "DrawingSys1")
+  (dbgview/->Drawing "Debug text drawing system")])
 
 
 (defn draw-state [state]
