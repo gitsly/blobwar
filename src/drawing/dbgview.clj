@@ -19,6 +19,8 @@
 
 (defrecord Drawing[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [_ state]
-    (draw-text state)))
+  (update [data state]
+    (println (:definition data))
+    ;;(draw-text state)
+    state))
 

@@ -58,22 +58,19 @@
       (q/ellipse x y 100 100))))
 
 
-(ecs/update
- (quildrawing/->Drawing "DrawingSys1") {:start 4})
+;;(ecs/update (dbgview/->Drawing "Debug text drawing system") )
 
-
-(loop [v 4]
-  (println v)
-  (if (zero? v) 
-    nil
-    (recur (dec v))))
-
-(loop [sys [(quildrawing/drawing "DrawingSys1")]
+(loop [sys [(quildrawing/drawing "DrawingSys1")
+            (dbgview/->Drawing "Debug text drawing system")]
        state {:counter 0}]
-  (zp/zprint (first sys) 12)
   (if (empty? sys) 
     state
-    (recur (rest sys) (ecs/update (first sys) state))))
+    (recur (rest sys)
+           (ecs/update (first sys) state) ; Let each 'system' update the state
+           )))
+
+
+
 
 
 (defn draw-state [state]
