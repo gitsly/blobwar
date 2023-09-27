@@ -9,9 +9,7 @@
 (defrecord Drawing[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
   (update [_ state]
-    4)
-  (test [_]
-    :apa))
+    4))
 
 ;; TODO: function can be generalized by passing in ::spec as well.
 (defn drawing

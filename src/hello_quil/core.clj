@@ -61,8 +61,6 @@
 (ecs/update
  (quildrawing/->Drawing "DrawingSys1") {:start 4})
 
-(ecs/test
- (quildrawing/->Drawing "DrawingSys1") )
 
 (loop [v 4]
   (println v)
