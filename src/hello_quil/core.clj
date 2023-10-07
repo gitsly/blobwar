@@ -1,3 +1,5 @@
+;; ECS game
+;; https://docs.unity3d.com/Packages/com.unity.entities@0.1/manual/ecs_core.html
 (ns hello-quil.core
   (:require [quil.core :as q]
             [quil.middleware :as m]
