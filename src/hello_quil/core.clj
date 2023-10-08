@@ -12,6 +12,10 @@
             [euclidean.math.vector :as v]
             [zprint.core :as zp]
 
+
+            ;; Custom quil middlewares
+            [middlewares.navigation :as nav]
+
             ;; referenced systems
             [systems.dbgview :as systems.dbgview]
             [systems.time :as systems.time]
@@ -41,7 +45,10 @@
   (q/color-mode :hsb)
   (q/text-font (q/create-font "Hack" 12 true))
 
-  {:systems [(quildrawing/drawing "DrawingSys1")
+
+  {:_INFO "Right mouse to PAN view, mouse wheel to zoom."
+
+   :systems [(quildrawing/drawing "DrawingSys1")
              (systems.dbgview/->Sys "Debug text drawing system")
              (systems.mouse/->Sys "Mouse controller system")
              (systems.time/->Sys "Time system")]
@@ -124,8 +131,10 @@
   :features [:keep-on-top]
 
   ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
-  :navigation-2d {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
-                  :position [320 240] }
+  :navigation-2d {:zoom 2 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
+                  :position [320 240]
+                                        ; :mouse-buttons #{ :right :center} ;; Doesnt seem to be configurable
+                  }
 
   :middleware [;; This sketch uses functional-mode middleware.
                ;; Check quil wiki for more info about middlewares and particularly
@@ -133,6 +142,7 @@
                m/fun-mode
 
                ;; For zooming and mouse control
-               m/navigation-2d])
+               nav/navigation
+               ])
 
 
