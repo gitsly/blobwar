@@ -8,6 +8,7 @@
             [drawing.quildrawing :as quildrawing]
             [drawing.dbgview :as dbgview]
             [systems.time :as systems.time]
+            [systems.mouse :as systems.mouse]
             [clj-time [core :as t]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
@@ -40,6 +41,7 @@
 
   {:systems [(quildrawing/drawing "DrawingSys1")
              (dbgview/->Drawing "Debug text drawing system")
+             (systems.mouse/->Mouse "Mouse controller system")
              (systems.time/->Time "Time system")]
    :circle-anim {:color 0
                  :angle 0 }})

@@ -17,7 +17,7 @@
 (defn update-time
   "Point out which time component in entire game-state to update with do-time"
   [state]
-  (update-in state [:time-info] do-time))
+  (update-in state [:time] do-time))
 
 (defrecord Time[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
