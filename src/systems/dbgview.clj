@@ -23,11 +23,8 @@
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
   (update [data state]
-    ;;    (println (:definition data))
-    ;;(draw-text state)
     state)
   (draw [_ state]
-    ;;    (println (:definition data))
     (draw-text state)
     state))
 

@@ -19,10 +19,10 @@
     (update-in [:mouse] system-fn)))
 
 
-(defrecord Mouse[definition]
-ecs/EcsSystem ; Realizes the EcsSystem protocol
-(update [data state]
-        (update-system state))
-(draw [_ state]
-      state))
+(defrecord Sys[definition]
+  ecs/EcsSystem ; Realizes the EcsSystem protocol
+  (update [data state]
+    (update-system state))
+  (draw [_ state]
+    state))
 

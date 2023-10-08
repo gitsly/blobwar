@@ -41,10 +41,11 @@
   (q/color-mode :hsb)
   (q/text-font (q/create-font "Hack" 12 true))
 
-  {:systems [(quildrawing/drawing "DrawingSys1") ; May not be required... giving fun-mode and navigation-2d etc. but lets see
-             (systems.dbgview/->System "Debug text drawing system")
-             (systems.mouse/->System "Mouse controller system")
-             (systems.time/->System "Time system")]
+  {:systems [(quildrawing/drawing "DrawingSys1")
+             (systems.dbgview/->Sys "Debug text drawing system")
+             (systems.mouse/->Sys "Mouse controller system")
+             (systems.time/->Sys "Time system")]
+
    :circle-anim {:color 0
                  :angle 0 }})
 
@@ -69,11 +70,10 @@
 
 
 (defn update-state [state]
-  (let [now (t/now)
-        dt (t/in-millis (t/interval (:last-time state) now))]
-    (-> state
-        (do-systems  (:systems state) ecs/update)
-        (update-in  [:circle-anim] update-circle))))
+  (-> state
+      (do-systems  (:systems state) ecs/update)
+      (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
+      ))
 
 
 (defn draw-circle
@@ -107,12 +107,18 @@
 
   (draw-circle (:circle-anim state)))
 
+(defn- mouse-dragged
+  [state event]
+  ;; (assoc state :mouse-dragged-info event)
+  (println event))
+
+
 (q/defsketch hello-quil
   :title (str "Blob" " " "War")
   :size [640 480]
                                         ; setup function called only once, during sketch initialization.
   :setup setup
-                                        ; update-state is called on each iteration before draw-state.
+
   :update update-state
   :draw draw-state
   :features [:keep-on-top]

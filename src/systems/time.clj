@@ -19,7 +19,7 @@
   [state]
   (update-in state [:time] do-time))
 
-(defrecord Time[definition]
+(defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
   (update [data state]
     (update-time state))
