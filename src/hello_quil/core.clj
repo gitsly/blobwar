@@ -114,9 +114,17 @@
   :update update-state
   :draw draw-state
   :features [:keep-on-top]
-                                        ; This sketch uses functional-mode middleware.
-                                        ; Check quil wiki for more info about middlewares and particularly
-                                        ; fun-mode.
-  :middleware [m/fun-mode])
+
+  ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
+  :navigation-2d {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
+                  :position [320 240] }
+
+  :middleware [;; This sketch uses functional-mode middleware.
+               ;; Check quil wiki for more info about middlewares and particularly
+               ;; fun-mode.
+               m/fun-mode
+
+               ;; For zooming and mouse control
+               m/navigation-2d])
 
 
