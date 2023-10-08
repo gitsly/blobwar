@@ -46,7 +46,7 @@
   (q/text-font (q/create-font "Hack" 12 true))
 
 
-  {:_INFO "Right mouse to PAN view, mouse wheel to zoom."
+  {:_INFO "Right mouse to PAN view, mouse wheel to zoom. Left mouse to select"
 
    :systems [(quildrawing/drawing "DrawingSys1")
              (systems.dbgview/->Sys "Debug text drawing system")
@@ -85,7 +85,9 @@
 
 (defn draw-circle
   [state]
-  (q/fill (:color state) 255 255)
+  (q/fill (:color state) 255 255 128)
+  (q/stroke 0 0 0 128)
+  (q/stroke-weight 2)
                                         ; Calculate x and y coordinates of the circle.
   (let [angle (:angle state)
         x (* 150 (q/cos angle))
@@ -106,7 +108,6 @@
 
 (defn draw-state [state]
   (q/background 240)
-  (q/stroke-weight 2)
   ;; TODO: make a system of text drawing.
                                         ;  (draw-text state)
   ;;  (update-state-via-systems ) 
@@ -116,9 +117,13 @@
 
 (defn- mouse-dragged
   [state event]
-  ;; (assoc state :mouse-dragged-info event)
-  (println event))
-
+  (assoc-in state [:mouse :dragged] event))
+(defn- mouse-pressed
+  [state event]
+  (assoc-in state [:mouse :pressed] event))
+(defn- mouse-released
+  [state event]
+  (assoc-in state [:mouse :released] event))
 
 (q/defsketch hello-quil
   :title (str "Blob" " " "War")
@@ -129,6 +134,11 @@
   :update update-state
   :draw draw-state
   :features [:keep-on-top]
+
+  ;; Note: the mouse 'system' is fed this info 
+  :mouse-pressed mouse-pressed
+  :mouse-released mouse-released
+  :mouse-dragged mouse-dragged
 
   ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
   :navigation-2d {:zoom 2 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in

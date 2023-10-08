@@ -9,14 +9,35 @@
   "Takes the entire component needed for the mouse system and updates it, returns the updated component"
   [state]
   (-> state
+      (assoc :button (q/mouse-button))
       (assoc :x (q/mouse-x))
       (assoc :y (q/mouse-y))))
 
 (defn- update-system
-"Point out which time component in entire game-state to update with do-time"
-[state]
-(-> state
-    (update-in [:mouse] system-fn)))
+  "Point out which time component in entire game-state to update with do-time"
+  [state]
+  (-> state
+      (update-in [:mouse] system-fn)))
+
+(defn- draw-fn
+  [state]
+  (q/push-matrix)
+  (q/reset-matrix) ; Loads the identity matrix
+  (q/stroke 0 0 0 200)
+  (q/fill 0 0 0 10)
+
+  (if (= (-> state :mouse :button) :left)
+    (do
+      (let [x1 (get-in state [:mouse :pressed :x])
+            y1 (get-in state [:mouse :pressed :y])
+            x2 (get-in state [:mouse :x])
+            y2 (get-in state [:mouse :y])
+            width (- x2 x1)
+            height (- y2 y1)]
+        (q/rect x1 y1 width height))))
+
+  (q/pop-matrix)
+  state)
 
 
 (defrecord Sys[definition]
@@ -24,5 +45,5 @@
   (update [data state]
     (update-system state))
   (draw [_ state]
-    state))
+    (draw-fn state)))
 
