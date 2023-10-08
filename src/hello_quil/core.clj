@@ -6,14 +6,16 @@
             ;;            [ecs.ecssystem :refer :all]
             [ecs.ecssystem :as ecs]
             [drawing.quildrawing :as quildrawing]
-            [drawing.dbgview :as dbgview]
-            [systems.time :as systems.time]
-            [systems.mouse :as systems.mouse]
             [clj-time [core :as t]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [euclidean.math.vector :as v]
-            [zprint.core :as zp]))
+            [zprint.core :as zp]
+
+            ;; referenced systems
+            [systems.dbgview :as systems.dbgview]
+            [systems.time :as systems.time]
+            [systems.mouse :as systems.mouse]))
 
 
 
@@ -39,10 +41,10 @@
   (q/color-mode :hsb)
   (q/text-font (q/create-font "Hack" 12 true))
 
-  {:systems [(quildrawing/drawing "DrawingSys1")
-             (dbgview/->Drawing "Debug text drawing system")
-             (systems.mouse/->Mouse "Mouse controller system")
-             (systems.time/->Time "Time system")]
+  {:systems [(quildrawing/drawing "DrawingSys1") ; May not be required... giving fun-mode and navigation-2d etc. but lets see
+             (systems.dbgview/->System "Debug text drawing system")
+             (systems.mouse/->System "Mouse controller system")
+             (systems.time/->System "Time system")]
    :circle-anim {:color 0
                  :angle 0 }})
 
