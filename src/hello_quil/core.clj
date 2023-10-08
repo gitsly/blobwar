@@ -18,6 +18,7 @@
             [systems.drawing :as systems.drawing]
             [systems.dbgview :as systems.dbgview]
             [systems.time :as systems.time]
+            [systems.entities :as systems.entities]
             [systems.mouse :as systems.mouse]))
 
 
@@ -41,6 +42,7 @@
    :systems [(systems.dbgview/->Sys "Debug text drawing system")
              (systems.mouse/->Sys "Mouse controller system")
              (systems.time/->Sys "Time system")
+             (systems.entities/->Sys "Entity handling system")
              (systems.drawing/->Sys "Drawing system")]
 
    ;;
@@ -92,18 +94,11 @@
              ))))
 
 ;; could this be implemented as a system in the ECS domain instead... perhaps...
-(defn do-entities
-  "Do handling of entities in respect to game-engine"
-  [state]
-  (let [next-id (count (get-in state [:entity :entities]))]
-    (-> state
-        (assoc-in  [:entity :next-entity-id] next-id))))
 
 
 (defn update-state [state]
   (-> state
       (do-systems  (:systems state) ecs/update)
-      do-entities
       (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
       ))
 
