@@ -9,7 +9,9 @@
   it, returns new time component"
   [state]
   (let [now (t/now)
-        dt (t/in-millis (t/interval (or (:last-time state) (t/now)) now))]
+        dt (if (:last-time state)
+             (t/in-millis (t/interval (:last-time state) now))
+             0)]
     (-> state
         (assoc :dt dt)
         (assoc :last-time now))))

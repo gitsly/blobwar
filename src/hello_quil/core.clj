@@ -5,18 +5,17 @@
             [quil.middleware :as m]
             ;;            [ecs.ecssystem :refer :all]
             [ecs.ecssystem :as ecs]
-            [drawing.quildrawing :as quildrawing]
             [clj-time [core :as t]]
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [euclidean.math.vector :as v]
             [zprint.core :as zp]
 
-
             ;; Custom quil middlewares
             [middlewares.navigation :as nav]
 
             ;; referenced systems
+            [systems.drawing :as systems.drawing]
             [systems.dbgview :as systems.dbgview]
             [systems.time :as systems.time]
             [systems.mouse :as systems.mouse]))
@@ -32,29 +31,46 @@
    :equal-check (= a b)})
 
 
-(comment
-  (let [start-time (t/now)]
-    ... do lots of work ...
-    (t/in-millis (t/interval start-time (t/now)))))
-
 ;;(s/explain ::ecs/system ecs/sample-system)
 ;;(s/explain ::ecs/system (:definition (Drawing. {:name "name1"})))
 
-(defn setup []
-  (q/frame-rate 30)
-  (q/color-mode :hsb)
-  (q/text-font (q/create-font "Hack" 12 true))
 
-
+(def start-state
   {:_INFO "Right mouse to PAN view, mouse wheel to zoom. Left mouse to select"
 
-   :systems [(quildrawing/drawing "DrawingSys1")
-             (systems.dbgview/->Sys "Debug text drawing system")
+   :systems [(systems.dbgview/->Sys "Debug text drawing system")
              (systems.mouse/->Sys "Mouse controller system")
-             (systems.time/->Sys "Time system")]
+             (systems.time/->Sys "Time system")
+             (systems.drawing/->Sys "Drawing system")]
+
+   ;;
+   ;; Hash map of entities composing the game-world
+   ;; each entity has  
+   :entity {:next-entity-id nil
+            :entities
+
+            (hash-map 0 {:translation [200 100]
+                         :color [255 0 0 255]
+                         :size 10
+                         :fighting {:weapon "SubLaser"
+                                    :strength 12.0 }}
+
+                      1 {:translation [220 110]
+                         :color [128 255 0 255]
+                         :size 8
+                         :fighting {:weapon "TopLaser"
+                                    :strength 12.0 }})}
 
    :circle-anim {:color 0
                  :angle 0 }})
+
+
+(defn setup []
+  (q/frame-rate 30)
+  (q/color-mode :rgb)
+  (q/text-font (q/create-font "Hack" 12 true))
+  start-state)
+
 
 (defn update-circle
   [state]
@@ -75,10 +91,19 @@
              (fn (first systems) state) ; Let each 'system' update the state
              ))))
 
+;; could this be implemented as a system in the ECS domain instead... perhaps...
+(defn do-entities
+  "Do handling of entities in respect to game-engine"
+  [state]
+  (let [next-id (count (get-in state [:entity :entities]))]
+    (-> state
+        (assoc-in  [:entity :next-entity-id] next-id))))
+
 
 (defn update-state [state]
   (-> state
       (do-systems  (:systems state) ecs/update)
+      do-entities
       (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
       ))
 
@@ -141,10 +166,8 @@
   :mouse-dragged mouse-dragged
 
   ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
-  :navigation-2d {:zoom 2 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
-                  :position [320 240]
-                                        ; :mouse-buttons #{ :right :center} ;; Doesnt seem to be configurable
-                  }
+  :navigation {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
+               :position [320 240]}
 
   :middleware [;; This sketch uses functional-mode middleware.
                ;; Check quil wiki for more info about middlewares and particularly
@@ -154,5 +177,3 @@
                ;; For zooming and mouse control
                nav/navigation
                ])
-
-

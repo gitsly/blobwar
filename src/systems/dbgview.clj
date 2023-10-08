@@ -8,7 +8,10 @@
   [state]
   (let [text-color [128 128 128]
         text-formatting-width 64
-        text-content (zp/zprint-str state text-formatting-width)]
+        state (select-keys state [:debug :navigation :entity :circle-anim]) ; filter which root keys of state to dbg
+        text-content (zp/zprint-str
+                      state
+                      text-formatting-width)]
     ;; Note that the border (the stroke) is centered on the point where
     ;; the shape is anchored.
     (q/push-matrix)
