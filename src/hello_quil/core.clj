@@ -19,6 +19,7 @@
             [systems.dbgview :as systems.dbgview]
             [systems.time :as systems.time]
             [systems.entities :as systems.entities]
+            [systems.events :as systems.events]
             [systems.mouse :as systems.mouse]))
 
 
