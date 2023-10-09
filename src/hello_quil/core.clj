@@ -88,93 +88,93 @@
 
 
 (defn update-circle
-[state]
-{:color (mod (+ (:color state) 0.7) 255)
- :angle (+ (:angle state) 0.01) })
+  [state]
+  {:color (mod (+ (:color state) 0.7) 255)
+   :angle (+ (:angle state) 0.01) })
 
 
 (defn do-systems 
-"Calls fn over a set of systems, Assuming EcsSystem realizing"
-[state
- systems
- fn]
-(loop [systems systems
-       state state]
-  (if (empty? systems) 
-    state
-    (recur (rest systems)
-           (fn (first systems) state) ; Let each 'system' update the state
-           ))))
+  "Calls fn over a set of systems, Assuming EcsSystem realizing"
+  [state
+   systems
+   fn]
+  (loop [systems systems
+         state state]
+    (if (empty? systems) 
+      state
+      (recur (rest systems)
+             (fn (first systems) state) ; Let each 'system' update the state
+             ))))
 
 ;; could this be implemented as a system in the ECS domain instead... perhaps...
 
 
 (defn update-state [state]
-(-> state
-    (do-systems  (:systems state) ecs/update)
-    (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
-    ))
+  (-> state
+      (do-systems  (:systems state) ecs/update)
+      (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
+      ))
 
 
 (defn draw-circle
-[state]
-(q/fill (:color state) 255 255 128)
-(q/stroke 0 0 0 128)
-(q/stroke-weight 2)
+  [state]
+  (q/fill (:color state) 255 255 128)
+  (q/stroke 0 0 0 128)
+  (q/stroke-weight 2)
                                         ; Calculate x and y coordinates of the circle.
-(let [angle (:angle state)
-      x (* 150 (q/cos angle))
-      y (* 150 (q/sin angle))
-      sz (* 200 (q/sin angle))]
+  (let [angle (:angle state)
+        x (* 150 (q/cos angle))
+        y (* 150 (q/sin angle))
+        sz (* 200 (q/sin angle))]
                                         ; Move origin point to the center of the sketch.
 
-  (q/with-translation [(/ (q/width) 2)
-                       (/ (q/height) 2)]
+    (q/with-translation [(/ (q/width) 2)
+                         (/ (q/height) 2)]
                                         ; Draw the circle.
-    (q/ellipse x y 100 100))
+      (q/ellipse x y 100 100))
 
-  (q/with-translation [(+ 120 (/ (q/width) 2))
-                       (/ (q/height) 2)]
+    (q/with-translation [(+ 120 (/ (q/width) 2))
+                         (/ (q/height) 2)]
                                         ; Draw the circle.
-    (q/ellipse x y sz 200))))
+      (q/ellipse x y sz 200))))
 
 
 (defn draw-state [state]
-(q/background 240)
-;; TODO: make a system of text drawing.
+  (q/background 240)
+  ;; TODO: make a system of text drawing.
                                         ;  (draw-text state)
-;;  (update-state-via-systems ) 
-(do-systems state (:systems state) ecs/draw)
+  ;;  (update-state-via-systems ) 
+  (do-systems state (:systems state) ecs/draw)
 
-(draw-circle (:circle-anim state)))
+  (draw-circle (:circle-anim state)))
 
 (defn- mouse-dragged
-[state event]
-;;  (assoc-in state [:mouse :dragged] event)
-state)
+  [state event]
+  ;;  (assoc-in state [:mouse :dragged] event)
+  state)
 
 (defn- mouse-pressed
-[state event]
-(let [button-id (q/mouse-button)] 
-  (-> state
-      (assoc-in [:mouse :pressed] event)
-      (update-in [:mouse :button] #(conj % button-id)))))
+  [state event]
+  (let [button-id (q/mouse-button)] 
+    (-> state
+        (assoc-in [:mouse :pressed] event)
+        (update-in [:mouse :button] #(conj % button-id)))))
 
 (defn- mouse-clicked
-"Fires an event in the event system"
-[state event]
-(let [ev (merge {:id :mouse-click} event)]
-  (systems.events/post-event state ev)))
+  "Fires an event in the event system"
+  [state event]
+  (let [ev (merge {:id :mouse-click} event)]
+    (systems.events/post-event state ev)))
 
 (defn- mouse-released
-[state event]
-(let [button-id (q/mouse-button)] 
-  (-> state
-      (update-in [:mouse :button] #(disj % button-id)))))
+  [state event]
+  (let [button-id (q/mouse-button)] 
+    (-> state
+        (update-in [:mouse :button] #(disj % button-id)))))
 
 (q/defsketch hello-quil
-:title (str "Blob" " " "War")
-:size [640 480]
+  :title (str "Blob" " " "War")
+  :size [640 480]
                                         ; setup function called only once, during sketch initialization.
   :setup setup
 
