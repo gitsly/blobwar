@@ -52,6 +52,14 @@
 
 ;; TODO: make some on-event function that utilizes the get-events
 ;; to make it easy to do if some event occured in state processing loop
+(defn handle
+  [state
+   event-id
+   handler-fn]
+  (let [first-matching-event (first (filter #(and (= (:id %) event-id)) (get-events state)))]
+    (if (some? first-matching-event)
+      (handler-fn first-matching-event))))
+
 
 (defn get-events
   "Returns the unprocessed events, that should be considered by listeners/handlers"

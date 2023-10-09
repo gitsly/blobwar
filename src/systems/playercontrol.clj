@@ -9,9 +9,14 @@
 
 (defn- system-fn
   [state]
-  (let [mouse-click-event (first (filter #(and (= (:id %) :mouse-click)) (systems.events/get-events state)))]
-    (if (some? mouse-click-event)
-      (println "pctrl: " mouse-click-event)))
+
+
+  ;;  (let [mouse-click-event (first (filter #(and (= (:id %) :mouse-click)) (systems.events/get-events state)))]
+  ;;    (if (some? mouse-click-event)
+  ;;      (println "pctrl: " mouse-click-event)))
+
+  (systems.events/handle state :mouse-click
+                         #(println "xctrl: " %))
 
   state)
 
