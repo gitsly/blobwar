@@ -6,7 +6,11 @@
 
 (defn- system-fn
   [state]
-  state)
+  (systems.events/handle state :spawn-blob
+                         #(do
+                            (println "Spawn: " %)
+                            state))
+  )
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol

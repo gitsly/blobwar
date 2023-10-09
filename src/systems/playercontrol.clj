@@ -10,16 +10,12 @@
 (defn- system-fn
   [state]
 
-
-  ;;  (let [mouse-click-event (first (filter #(and (= (:id %) :mouse-click)) (systems.events/get-events state)))]
-  ;;    (if (some? mouse-click-event)
-  ;;      (println "pctrl: " mouse-click-event)))
-
-  (systems.events/handle state :mouse-click
-                         #(println "xctrl: " %))
-
-  state)
-
+  (-> state
+      (systems.events/handle :mouse-click
+                             #(let [x (:x %)
+                                    y (:y %)]
+                                ;; Post a new event for creating a blob (if such a system would exist :)
+                                (systems.events/post-event state {:id :spawn-blob :x x :y y})))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol

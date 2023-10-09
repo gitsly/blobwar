@@ -50,21 +50,11 @@
                #(conj % event))
     state))
 
-;; TODO: make some on-event function that utilizes the get-events
-;; to make it easy to do if some event occured in state processing loop
-(defn handle
-  [state
-   event-id
-   handler-fn]
-  (let [first-matching-event (first (filter #(and (= (:id %) event-id)) (get-events state)))]
-    (if (some? first-matching-event)
-      (handler-fn first-matching-event))))
-
-
-(defn get-events
+(defn- get-events
   "Returns the unprocessed events, that should be considered by listeners/handlers"
   [state]
   (filter #(not (:processed %)) (-> state :event :events)))
+
 
 (defn- do-events
   "Do handling of events in respect to game-engine"
@@ -76,6 +66,19 @@
                                (map #(assoc % :processed true) events))]
     (-> state
         (assoc-in [:event :events] (mark-as-processed-fn new-events)))))
+
+(defn handle
+  "function that utilizes the get-events
+  to make it easy to do if some event occured in state processing loop"
+  [state
+   event-id
+   handler-fn]
+  (let [first-matching-event (first (filter #(and (= (:id %) event-id)) (get-events state)))]
+    (if (some? first-matching-event)
+      (handler-fn first-matching-event)
+      state)))
+
+
 
 
 (defrecord Sys[definition]
