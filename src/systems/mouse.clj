@@ -9,7 +9,7 @@
   "Takes the entire component needed for the mouse system and updates it, returns the updated component"
   [state]
   (-> state
-      (assoc :button (q/mouse-button))
+      ;; Note: button state needs to be tracked in core.clj for quil reasons (may be fixed somehow but unsure how)
       (assoc :x (q/mouse-x))
       (assoc :y (q/mouse-y))))
 
@@ -26,15 +26,15 @@
   (q/stroke 0 0 0 200)
   (q/fill 0 0 0 10)
 
-  (if (= (-> state :mouse :button) :left)
-    (do
-      (let [x1 (get-in state [:mouse :pressed :x])
-            y1 (get-in state [:mouse :pressed :y])
-            x2 (get-in state [:mouse :x])
-            y2 (get-in state [:mouse :y])
-            width (- x2 x1)
-            height (- y2 y1)]
-        (q/rect x1 y1 width height))))
+  ;;  (if (= (-> state :mouse :button) :left)
+  ;;    (do
+  ;;      (let [x1 (get-in state [:mouse :pressed :x])
+  ;;            y1 (get-in state [:mouse :pressed :y])
+  ;;            x2 (get-in state [:mouse :x])
+  ;;            y2 (get-in state [:mouse :y])
+  ;;            width (- x2 x1)
+  ;;            height (- y2 y1)]
+  ;;        (q/rect x1 y1 width height))))
 
   (q/pop-matrix)
   state)

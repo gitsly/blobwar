@@ -19,7 +19,7 @@
              ;; Set true when event has been processsed  (one loop)
              ::processed 
 
-             ;; Set true whenever someone has handled the event, Note:
+             ;; Optionally set true whenever someone has handled the event, Note:
              ;; many can handle the event, this is only an indication
              ;; that the event is actually seen by someone. Event
              ;; handling is performed in an undetermined but
@@ -40,31 +40,35 @@
 (def sample-state { :event {:events sample-events}})
 ;;(map #(s/valid? ::event %) sample-events)
 
-(defn add-event
+(defn post-event
   "Adds the passed event to the list, checks event validity before adding"
   [state
    event]
+  ;;(println "Post event: " event)
   (if (s/valid? ::event event)
     (update-in state [:event :events]
                #(conj % event))
     state))
 
+;; TODO: make some on-event function that utilizes the get-events
+;; to make it easy to do if some event occured in state processing loop
 
 (defn get-events
   "Returns the unprocessed events, that should be considered by listeners/handlers"
   [state]
   (filter #(not (:processed %)) (-> state :event :events)))
 
-
 (defn- do-events
   "Do handling of events in respect to game-engine"
   [state]
-  (-> state
-      ;; TODO: set all events to 'processed' -> this will lead to events being 'active' one engine 'loop'
-      ;; and then be removed (processed being set)
+  ;;  (Thread/sleep 500) ; To make events easier to see in dbgview.
+  ;;
+  (let [new-events (get-events state)
+        mark-as-processed-fn (fn [events]
+                               (map #(assoc % :processed true) events))]
+    (-> state
+        (assoc-in [:event :events] (mark-as-processed-fn new-events)))))
 
-      (assoc-in [:event :events] [{:id :ev-event }]) ; Test
-      ))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
@@ -73,7 +77,3 @@
      state))
   (draw [_ state]
     state))
-
-;; Manual testing below
-(get-events sample-state)
-

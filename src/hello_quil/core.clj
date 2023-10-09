@@ -15,12 +15,14 @@
             [middlewares.navigation :as nav]
 
             ;; referenced systems
-            [systems.drawing :as systems.drawing]
-            [systems.dbgview :as systems.dbgview]
-            [systems.time :as systems.time]
-            [systems.entities :as systems.entities]
-            [systems.events :as systems.events]
-            [systems.mouse :as systems.mouse]))
+            [systems.drawing]
+            [systems.dbgview]
+            [systems.time]
+            [systems.entities]
+            [systems.playercontrol]
+            [systems.events]
+            [systems.mouse]
+            [systems.events :as systems.events]))
 
 
 
@@ -40,12 +42,21 @@
 (def start-state
   {:_INFO "Right mouse to PAN view, mouse wheel to zoom. Left mouse to select"
 
-   :systems [(systems.dbgview/->Sys "Debug text drawing system")
+   :systems [
+
+             (systems.dbgview/->Sys "Debug text drawing system")
              (systems.mouse/->Sys "Mouse controller system")
              (systems.time/->Sys "Time system")
              (systems.entities/->Sys "Entity handling system")
-             (systems.drawing/->Sys "Drawing system")]
+             (systems.playercontrol/->Sys "Player control system")
+             (systems.drawing/->Sys "Drawing system")
 
+             (systems.events/->Sys "Event system")
+             ]
+
+   :mouse {
+           ;; Hash set of buttons pressed
+           :button #{}}
    ;;
    ;; Hash map of entities composing the game-world
    ;; each entity has  
@@ -138,38 +149,52 @@
 
 (defn- mouse-dragged
   [state event]
-  (assoc-in state [:mouse :dragged] event))
+  ;;  (assoc-in state [:mouse :dragged] event)
+  state)
+
 (defn- mouse-pressed
   [state event]
-  (assoc-in state [:mouse :pressed] event))
+  (let [button-id (q/mouse-button)] 
+    (-> state
+        (update-in [:mouse :button] #(conj % button-id)))))
+
+(defn- mouse-clicked
+  "Fires an event in the event system"
+  [state event]
+  (let [ev (merge {:id :mouse-click} event)]
+    (systems.events/post-event state ev)))
+
 (defn- mouse-released
   [state event]
-  (assoc-in state [:mouse :released] event))
+  (let [button-id (q/mouse-button)] 
+    (-> state
+        (update-in [:mouse :button] #(disj % button-id)))))
 
 (q/defsketch hello-quil
-  :title (str "Blob" " " "War")
-  :size [640 480]
+:title (str "Blob" " " "War")
+:size [640 480]
                                         ; setup function called only once, during sketch initialization.
-  :setup setup
+:setup setup
 
-  :update update-state
-  :draw draw-state
-  :features [:keep-on-top]
+:update update-state
+:draw draw-state
+:features [:keep-on-top]
 
-  ;; Note: the mouse 'system' is fed this info 
-  :mouse-pressed mouse-pressed
-  :mouse-released mouse-released
-  :mouse-dragged mouse-dragged
+;; Note: the mouse 'system' is fed this info 
+:mouse-pressed mouse-pressed
+:mouse-released mouse-released
+:mouse-dragged mouse-dragged
+:mouse-clicked mouse-clicked
 
-  ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
-  :navigation {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
-               :position [320 240]}
+;; navigation-2d options. Note: this data is also passed along in the state!, nice...
+:navigation {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
+             :position [320 240]}
 
-  :middleware [;; This sketch uses functional-mode middleware.
-               ;; Check quil wiki for more info about middlewares and particularly
-               ;; fun-mode.
-               m/fun-mode
+:middleware [;; This sketch uses functional-mode middleware.
+             ;; Check quil wiki for more info about middlewares and particularly
+             ;; fun-mode.
+             m/fun-mode
 
-               ;; For zooming and mouse control
-               nav/navigation
-               ])
+             ;; For zooming and mouse control
+             nav/navigation
+             ])
