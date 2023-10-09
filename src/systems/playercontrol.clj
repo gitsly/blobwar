@@ -9,22 +9,10 @@
 
 (defn- system-fn
   [state]
-  ;; Check for mouse button released
+  (let [mouse-click-event (first (filter #(and (= (:id %) :mouse-click)) (systems.events/get-events state)))]
+    (if (some? mouse-click-event)
+      (println "pctrl: " mouse-click-event)))
 
-
-  (if (not (empty? (systems.events/get-events state)))
-    (println "go"))
-
-  ;;  (println 
-  ;;   (filter #(and (= (:id %) :mouse-click)) (systems.events/get-events state)))
-  
-  ;; (println "Test: ")
-  ;;  (if (not (empty? ))
-  ;;   println "clicked")
-  ;;)
-
-  ;; Add check if mouse button pressed (or something)
-  ;;  (systems.events/post-event :add-blob {})
   state)
 
 
