@@ -76,8 +76,6 @@
    :circle-anim {:color 0
                  :angle 0 }})
 
-(:entity
- (systems.entities/add-entity start-state {:strenth 1 }))
 
 
 (defn setup []

@@ -15,6 +15,7 @@
                              #(let [x (:x %)
                                     y (:y %)]
                                 ;; Post a new event for creating a blob (if such a system would exist :)
+                                ;; TODO: offset wih navigation to get world coords
                                 (systems.events/post-event state {:id :spawn-blob :x x :y y})))))
 
 (defrecord Sys[definition]
