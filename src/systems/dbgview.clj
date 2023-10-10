@@ -8,10 +8,15 @@
   [state]
   (let [text-color [128 128 128]
         text-formatting-width 64
+        ;; Use below str for quickly debugging specifics in state
+        quick-dbg-str (zp/zprint-str
+                       (:debug state)
+                       text-formatting-width)
         state (select-keys state [:graphics-matrix :mouse :event]) ; filter which root keys of state to dbg
         text-content (zp/zprint-str
                       state
-                      text-formatting-width)]
+                      text-formatting-width)
+        ]
     ;; Note that the border (the stroke) is centered on the point where
     ;; the shape is anchored.
     (q/push-matrix)
@@ -20,6 +25,9 @@
     (q/text text-content
             10
             10)
+
+    (q/fill [255 0 0])
+    (q/text quick-dbg-str 10 240)
     (q/pop-matrix)))
 
 

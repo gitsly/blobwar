@@ -9,6 +9,7 @@
             [clojure.spec.alpha :as s]
             [clojure.string :as str]
             [euclidean.math.vector :as v]
+            [euclidean.math.matrix :as mat]
             [zprint.core :as zp]
 
             ;; Custom quil middlewares
@@ -26,17 +27,39 @@
             [systems.events]
             [systems.entities]))
 
+;; TODO points
+;; * Unit selection (via playersystem)
+;; * Unit commands (via playersystem)
+;; * Velocity system? (to move stuff around)
+;; * Save state into JSON, load state...
+;; *
+
+
 (def gamestate (atom {}))
 
-;;(println @gamestate)
+;; Sample matrix multiplication
+;; [m00 m01 m02][x]   [m00*x + m01*y + m02*1]   [x']
+;; [m10 m11 m12][y] = [m10*x + m11*y + m12*1] = [y']
+;; [ 0   0   1 ][1]   [ 0*x  +  0*y  +  1*1 ]   [1 ]
+(def graphics-matrix (atom nil))
+
 
 ;; Vector sample usage
 (let [a (v/vector 2 5)
-      b (v/into-vector [2 5])]
+      b (v/into-vector [2 5])
+      mfloat [[1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0]]
+      m1 (mat/matrix [1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0])
+      m2 (mat/matrix (vec (flatten mfloat)))]
   {:normalized (v/normalize a)
    :magnitude (v/magnitude a)
    :normlen (v/magnitude (v/normalize a))
-   :equal-check (= a b)})
+   :x-in-a (v/.getX a)
+   :equal-check (= a b)
+   :m1 m1
+   :m1-equals-m2 (= m1 m2)
+   ;; :m1-type (type m1)
+   :mvec (mat/transform m1 a)
+   })
 
 
 ;;(s/explain ::ecs/system ecs/sample-system)
@@ -82,47 +105,44 @@
 
 
 (defn setup []
-  (q/frame-rate 30)
-  (q/color-mode :rgb)
-  (q/text-font (q/create-font "Hack" 12 true))
-  start-state)
+(q/frame-rate 60)
+(q/color-mode :rgb)
+(q/text-font (q/create-font "Hack" 12 true))
+start-state)
 
 
 (defn update-circle
-  [state]
-  {:color (mod (+ (:color state) 0.7) 255)
-   :angle (+ (:angle state) 0.01) })
+[state]
+{:color (mod (+ (:color state) 0.7) 255)
+ :angle (+ (:angle state) 0.01) })
 
 
 (defn do-systems 
-  "Calls fn over a set of systems, Assuming EcsSystem realizing"
-  [state
-   systems
-   fn]
-  (loop [systems systems
-         state state]
-    (if (empty? systems) 
-      state
-      (recur (rest systems)
-             (fn (first systems) state) ; Let each 'system' update the state
-             ))))
+"Calls fn over a set of systems, Assuming EcsSystem realizing"
+[state
+ systems
+ fn]
+(loop [systems systems
+       state state]
+  (if (empty? systems) 
+    state
+    (recur (rest systems)
+           (fn (first systems) state) ; Let each 'system' update the state
+           ))))
 
 ;; could this be implemented as a system in the ECS domain instead... perhaps...
 
-
-
 (defn update-state [state]
 
-  ;;(println
-  ;; (.getMatrix (q/current-graphics)))
-  (reset! gamestate state)
+(reset! gamestate state)
+;;  (println @graphics-matrix)
+(-> state
+    (do-systems  (:systems state) ecs/update)
 
-  (-> state
-      (do-systems  (:systems state) ecs/update)
-      ;; Get the current matrix from raw graphics (processing)
-      (assoc :graphics-matrix (.getMatrix (q/current-graphics)))
-      (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
-      ))
+    (assoc :graphics-matrix @graphics-matrix)
+
+    ;; to get some visual representation in scene... until rendering of entities is complete
+    (update-in  [:circle-anim] update-circle)))
 
 
 (defn draw-circle
@@ -130,9 +150,6 @@
   (q/fill (:color state) 255 255 128)
   (q/stroke 0 0 0 128)
   (q/stroke-weight 2)
-
-
-
                                         ; Calculate x and y coordinates of the circle.
   (let [angle (:angle state)
         x (* 150 (q/cos angle))
@@ -150,13 +167,24 @@
                                         ; Draw the circle.
       (q/ellipse x y sz 200))))
 
-
 (defn draw-state [state]
   (q/background 240)
   ;; TODO: make a system of text drawing.
                                         ;  (draw-text state)
   ;;  (update-state-via-systems ) 
   (do-systems state (:systems state) ecs/draw)
+
+  ;; Get the current matrix from raw graphics (processing), needs to be done in the draw
+  ;; is there a user-draw? somewhere to capture this without atom
+  (reset! graphics-matrix (mat/matrix 
+                           (let [matrix (.getMatrix (q/current-graphics))]
+                             [(.-m00 matrix)
+                              (.-m01 matrix)
+                              (.-m02 matrix)
+                              (.-m10 matrix)
+                              (.-m11 matrix)
+                              (.-m12 matrix)])))
+
 
   (draw-circle (:circle-anim state)))
 
