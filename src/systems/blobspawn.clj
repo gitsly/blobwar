@@ -14,7 +14,7 @@
                             ;;(println "Spawn a blob via event: " %)
                             (systems.entities/add-entity
                              state {:translation [(:x %) (:y %)]
-                                    :color [255 0 0 255]
+                                    :color [45 128 174 255] ; Color for the blobs should be all but red, reserve red color for blood spatter =)
                                     :size 10 }))))
 
 (defrecord Sys[definition]

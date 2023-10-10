@@ -26,6 +26,9 @@
             [systems.events]
             [systems.entities]))
 
+(def gamestate (atom {}))
+
+;;(println @gamestate)
 
 ;; Vector sample usage
 (let [a (v/vector 2 5)
@@ -62,13 +65,13 @@
    ;; Hash map of entities composing the game-world
    ;; each entity has  
    :entity {:entities (hash-map 0 {:translation [200 100]
-                                   :color [255 0 0 255]
+                                   :color [85 128 174 255]
                                    :size 10
                                    :fighting {:weapon "SubLaser"
                                               :strength 12.0 }}
 
                                 1 {:translation [220 110]
-                                   :color [128 255 0 255]
+                                   :color [85 72 174 255]
                                    :size 8
                                    :fighting {:weapon "TopLaser"
                                               :strength 12.0 }})}
@@ -112,6 +115,7 @@
 
   ;;(println
   ;; (.getMatrix (q/current-graphics)))
+  (reset! gamestate state)
 
   (-> state
       (do-systems  (:systems state) ecs/update)
