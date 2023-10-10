@@ -7,9 +7,11 @@
 
 (defn- system-fn
   [state]
+  ;; re-frame style?
+  ;; event handlers, can be chained... but also mixed with other state updates
   (systems.events/handle state :spawn-blob
                          #(do
-                            (println "Spawn a blob via event: " %)
+                            ;;(println "Spawn a blob via event: " %)
                             (systems.entities/add-entity
                              state {:translation [(:x %) (:y %)]
                                     :color [255 0 0 255]

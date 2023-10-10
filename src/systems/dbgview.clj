@@ -8,7 +8,7 @@
   [state]
   (let [text-color [128 128 128]
         text-formatting-width 64
-        state (select-keys state [:mouse :event]) ; filter which root keys of state to dbg
+        state (select-keys state [:graphics-matrix :mouse :event]) ; filter which root keys of state to dbg
         text-content (zp/zprint-str
                       state
                       text-formatting-width)]

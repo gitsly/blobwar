@@ -107,9 +107,16 @@
 ;; could this be implemented as a system in the ECS domain instead... perhaps...
 
 
+
 (defn update-state [state]
+
+  ;;(println
+  ;; (.getMatrix (q/current-graphics)))
+
   (-> state
       (do-systems  (:systems state) ecs/update)
+      ;; Get the current matrix from raw graphics (processing)
+      (assoc :graphics-matrix (.getMatrix (q/current-graphics)))
       (update-in  [:circle-anim] update-circle) ; to get some visual representation in scene... until rendering of entities is complete
       ))
 
@@ -119,6 +126,9 @@
   (q/fill (:color state) 255 255 128)
   (q/stroke 0 0 0 128)
   (q/stroke-weight 2)
+
+
+
                                         ; Calculate x and y coordinates of the circle.
   (let [angle (:angle state)
         x (* 150 (q/cos angle))
