@@ -29,10 +29,14 @@
 
 ;; TODO points
 ;; * Unit selection (via playercontrol)
-;;   - :selected component for entities,
-;;   - renderer (blob) for selected or not
+;;   X :selected component for entities,
+;;   X renderer (blob) for selected or not
+;;   X spec for :selected and :translation -> ::blob
 ;;   - send event from playercontrol
-;;   - selection system with spec for :selected and :translation
+;;     . include bounds (spec [x1 y1] [x2 y2])
+;;   - selection system
+;;     . check if inside bounds
+;;   - Deselect (right mouse click)
 ;;
 ;; * Unit commands (via playersystem)
 ;; * Velocity system? (to move stuff around)

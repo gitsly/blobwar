@@ -24,19 +24,17 @@
                      (m/invert view-matrix))]
 
     (systems.events/handle state :mouse-click
-                           ;; (mat/transform m1 a)
                            #(let [mp (v/vector (:x %) (:y %))
                                   p (m/transform inv-matrix mp)]
-                              ;; TODO: invert graphics-matrix and spawn properly in world-space 
 
-                              ;; Post a new event for creating a blob (if such a system would exist :)
-                              ;; TODO: offset wih navigation to get world coords
-                              (-> state
-                                  (assoc-in [:debug :spawntest] {:inv-matrix inv-matrix
-                                                                 :mp mp
-                                                                 :p p })
+                              (if (= (:button %) :left)
+                                (-> state
+                                    (assoc-in [:debug :spawntest] {:inv-matrix inv-matrix
+                                                                   :mp mp
+                                                                   :p p })
 
-                                  (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))))))
+                                    (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
+                                state)))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
