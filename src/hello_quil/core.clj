@@ -28,7 +28,12 @@
             [systems.entities]))
 
 ;; TODO points
-;; * Unit selection (via playersystem)
+;; * Unit selection (via playercontrol)
+;;   - :selected component for entities,
+;;   - renderer (blob) for selected or not
+;;   - send event from playercontrol
+;;   - selection system with spec for :selected and :translation
+;;
 ;; * Unit commands (via playersystem)
 ;; * Velocity system? (to move stuff around)
 ;; * Save state into JSON, load state...
@@ -89,12 +94,14 @@
    ;; each entity has  
    :entity {:entities (hash-map 0 {:translation [200 100]
                                    :color [85 128 174 255]
+                                   :selected true 
                                    :size 10
                                    :fighting {:weapon "SubLaser"
                                               :strength 12.0 }}
 
                                 1 {:translation [220 110]
                                    :color [85 72 174 255]
+                                   :selected false 
                                    :size 8
                                    :fighting {:weapon "TopLaser"
                                               :strength 12.0 }})}

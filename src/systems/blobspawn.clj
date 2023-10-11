@@ -5,6 +5,11 @@
    [systems.events]
    [systems.entities]))
 
+(def default-blob
+  {:color [45 128 174 255] ; Color for the blobs should be all but red, reserve red color for blood spatter =)
+   :selected false
+   :size 10 })
+
 (defn- system-fn
   [state]
   ;; re-frame style?
@@ -13,9 +18,8 @@
                          #(do
                             ;;(println "Spawn a blob via event: " %)
                             (systems.entities/add-entity
-                             state {:translation [(:x %) (:y %)]
-                                    :color [45 128 174 255] ; Color for the blobs should be all but red, reserve red color for blood spatter =)
-                                    :size 10 }))))
+                             state (merge default-blob
+                                          {:translation [(:x %) (:y %)] })))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
