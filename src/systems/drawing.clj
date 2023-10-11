@@ -3,29 +3,12 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [ecs.ecssystem :as ecs]
-            [clojure.spec.alpha :as s]))
+            [entities.blob]
+            [clojure.spec.alpha :as s]
+            [systems.entities :as entities]))
 
 (def non-selected-color [0 0 0 128])
 (def selected-color [147 235 229 128])
-
-(s/def ::size number?)
-(s/def ::selected boolean?)
-
-(s/def ::drawable-blob
-  (s/keys :req-un [::translation ::color ::size ::selected])) ;; Require unnamespaced keys
-
-;; Test spec
-(let [thing {:translation [220 110]
-             :size 12
-             :selected 1
-             :color [128 255 0 255]
-             :fighting {:weapon "TopLaser"
-                        :strength 12.0 }}] 
-  (if (s/valid? ::drawable-blob thing)
-    thing
-    (s/explain-str ::drawable-blob thing)))
-
-
 
 (defn draw-circle
   [[x y]
@@ -57,7 +40,7 @@
 
 (defn draw-fn
   [state]
-  (let [drawable-blobs (filter #(s/valid? ::drawable-blob %)
+  (let [drawable-blobs (filter #(s/valid? :entities.blob/blob %)
                                (-> state :entity :entities vals))]
     (doseq [blob drawable-blobs]
       (draw-blob blob))))

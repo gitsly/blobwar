@@ -3,12 +3,9 @@
    [systems.events]
    [ecs.ecssystem :as ecs]
    [systems.events]
-   [systems.entities]))
-
-(def default-blob
-  {:color [45 128 174 255] ; Color for the blobs should be all but red, reserve red color for blood spatter =)
-   :selected false
-   :size 10 })
+   [systems.entities]
+   [entities.blob]
+   [clojure.spec.alpha :as s]))
 
 (defn- system-fn
   [state]
@@ -18,7 +15,7 @@
                          #(do
                             ;;(println "Spawn a blob via event: " %)
                             (systems.entities/add-entity
-                             state (merge default-blob
+                             state (merge entities.blob/default
                                           {:translation [(:x %) (:y %)] })))))
 
 (defrecord Sys[definition]
