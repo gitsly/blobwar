@@ -85,7 +85,9 @@
              (systems.mouse/->Sys "Mouse controller system")
              (systems.time/->Sys "Time system")
              (systems.entities/->Sys "Entity handling system")
-             (systems.playercontrol/->Sys "Player control system")
+             (systems.playercontrol/->Sys {:id "player 1"
+                                           :description "Player control system"})
+
              (systems.drawing/->Sys "Drawing system")
              (systems.blobspawn/->Sys "Blob spawning system")
              (systems.selection/->Sys "Selection system")
@@ -119,10 +121,10 @@
 
 
 (defn setup []
-(q/frame-rate 60)
-(q/color-mode :rgb)
-(q/text-font (q/create-font "Hack" 12 true))
-start-state)
+  (q/frame-rate 60)
+  (q/color-mode :rgb)
+  (q/text-font (q/create-font "Hack" 12 true))
+  start-state)
 
 
 (defn update-circle

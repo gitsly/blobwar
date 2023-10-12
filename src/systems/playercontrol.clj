@@ -14,24 +14,27 @@
 ;;   (m/matrix [m00 m01 m02 m10 m11 m12]))
 
 (defn- system-fn
-  [state]
+  [player
+   state]
   (let [view-matrix (:graphics-matrix state)
         inv-matrix (if view-matrix
                      (m/invert view-matrix))]
 
     (systems.events/handle state :mouse-click
                            #(let [mp (v/vector (:x %) (:y %))
-                                  p (m/transform inv-matrix mp)]
+                                  p (m/transform inv-matrix mp)
+                                  player-id (:id player)]
 
                               (if (= (:button %) :left)
                                 (-> state
+                                    (assoc-in [:debug] {:id player-id})
                                     (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
                                 state)))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
-    (system-fn state))
+  (update [player state]
+    (system-fn player state))
   (draw [_ state]
     state))
 

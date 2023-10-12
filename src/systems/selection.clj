@@ -4,24 +4,21 @@
    [ecs.ecssystem :as ecs]
    [quil.core :as q]
    [euclidean.math.vector :as v]
-   [euclidean.math.matrix :as m]))
+   [euclidean.math.matrix :as m]
+   [clojure.spec.alpha :as s]))
+
+(s/def ::start (s/coll-of number?))
+(s/def ::end (s/coll-of number?))
+
+(s/def ::box-selection (s/keys :req-un [::start ::end]))
+
+(s/valid? ::box-selection {:start [1.0 2]
+                           :end [1.0 2]})
+
+
 
 (defn- system-fn
   [state]
-  (comment
-    (let [view-matrix (:graphics-matrix state)
-          inv-matrix (if view-matrix
-                       (m/invert view-matrix))]
-
-      (systems.events/handle state :mouse-click
-                             #(let [mp (v/vector (:x %) (:y %))
-                                    p (m/transform inv-matrix mp)]
-
-                                (if (= (:button %) :left)
-                                  (-> state
-                                      (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
-                                  state)))))
-
   state)
 
 (defn- draw-fn
@@ -31,7 +28,6 @@
   (q/reset-matrix) ; Loads the identity matrix
   (q/stroke 0 0 0 200)
   (q/fill 0 0 0 10)
-
   (if (contains? (-> state :mouse :button) :left)
     (do
       (let [x1 (get-in state [:mouse :pressed :x])
@@ -43,6 +39,7 @@
         (q/rect x1 y1 width height))))
   (q/pop-matrix)
   state)
+
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
