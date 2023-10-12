@@ -3,11 +3,7 @@
    [systems.events]
    [ecs.ecssystem :as ecs]
    [euclidean.math.vector :as v]
-   [euclidean.math.matrix :as m]
-   [systems.events :as systems.events]))
-
-;; TODO: make a control that stores current 'state' into an atom
-;; to make debugging easier in REPL.
+   [euclidean.math.matrix :as m]))
 
 ;; (let [m00 1
 ;;       m01 2 
@@ -29,10 +25,6 @@
 
                               (if (= (:button %) :left)
                                 (-> state
-                                    (assoc-in [:debug :spawntest] {:inv-matrix inv-matrix
-                                                                   :mp mp
-                                                                   :p p })
-
                                     (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
                                 state)))))
 

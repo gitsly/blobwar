@@ -25,6 +25,7 @@
             [systems.mouse]
             [systems.blobspawn]
             [systems.events]
+            [systems.selection]
             [systems.entities]))
 
 ;; TODO points
@@ -87,6 +88,8 @@
              (systems.playercontrol/->Sys "Player control system")
              (systems.drawing/->Sys "Drawing system")
              (systems.blobspawn/->Sys "Blob spawning system")
+             (systems.selection/->Sys "Selection system")
+             
              (systems.events/->Sys "Event system")
              ]
 
