@@ -2,6 +2,7 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [ecs.ecssystem :as ecs]
+            [systems.movement]
             [clojure.spec.alpha :as s]))
 
 ;; Note: when using outside this file :entities.blob/blob
@@ -9,7 +10,7 @@
 (s/def ::size number?)
 (s/def ::selected boolean?)
 
-(s/def ::selectable (s/keys :req-un [::selected ::translation]))
+(s/def ::selectable (s/keys :req-un [::selected :systems.movement/translation]))
 
 (s/def ::blob
   (s/and ::selectable

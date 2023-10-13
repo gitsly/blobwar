@@ -1,4 +1,5 @@
 (ns euclidean.math.vector
+  (:require  [clojure.spec.alpha :as s])
   (:refer-clojure :exclude [vector]))
 
 (defn- add-hashcode [hash x]
@@ -440,3 +441,14 @@
 
 (defmethod print-dup Vector4D [^Vector4D v ^java.io.Writer w]
   (.write w (.toString v)))
+
+
+;;--------- Specs --------
+;; TODO: move to vector ecluidian 
+(defn vector2d-data?
+  [data]
+  (let [[x y] data]
+    (if (and (number? x) (number? y))
+      true false)))
+
+(s/def ::vector vector2d-data?)

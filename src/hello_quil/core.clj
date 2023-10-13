@@ -26,6 +26,7 @@
             [systems.blobspawn]
             [systems.events]
             [systems.selection]
+            [systems.movement]
             [systems.entities]))
 
 ;; TODO points
@@ -87,11 +88,11 @@
              (systems.entities/->Sys "Entity handling system")
              (systems.playercontrol/->Sys {:id "player 1"
                                            :description "Player control system"})
-
              (systems.drawing/->Sys "Drawing system")
              (systems.blobspawn/->Sys "Blob spawning system")
              (systems.selection/->Sys "Selection system")
-             
+             (systems.movement/->Sys "Movement system")
+
              (systems.events/->Sys "Event system")
              ]
 
@@ -101,14 +102,18 @@
    ;;
    ;; Hash map of entities composing the game-world
    ;; each entity has  
-   :entity {:entities (hash-map 0 {:translation [200 100]
+   :entity {:entities (hash-map 0 {:translation (v/vector 200 100)
                                    :color [85 128 174 255]
                                    :selected true 
                                    :size 10
                                    :fighting {:weapon "SubLaser"
-                                              :strength 12.0 }}
+                                              :strength 12.0 }
 
-                                1 {:translation [220 110]
+                                   :movement {:velocity (v/vector 0.02 0)
+                                              :accel (v/vector 0 0)
+                                              :max-velocity 5 }}
+
+                                1 {:translation (v/vector 220 110)
                                    :color [85 72 174 255]
                                    :selected false 
                                    :size 8
@@ -118,6 +123,12 @@
    :circle-anim {:color 0
                  :angle 0 }})
 
+
+(let [entity  (-> start-state :entity :entities vals first)
+      {{velocity :velocity
+        max-velocity :max-velocity } :movement
+       translation :translation } entity]
+  (v/add* translation velocity))
 
 
 (defn setup []

@@ -8,24 +8,9 @@
    [clojure.spec.alpha :as s]
    [systems.entities]))
 
-;; TODO: move to vector ecluidian 
-(defn vector2d-data?
-  [data]
-  (let [[x y] data]
-    (if (and (number? x) (number? y))
-      true false)))
 
-
-(s/def ::vector vector2d-data?)
-
-(vector2d-data? [1 2]) ; => true
-(vector2d-data? (v/vector 1 2)) ; => true
-(s/valid? ::vector (v/vector 1 2)); => true
-(s/valid? ::vector [1 ""]); => false
-
-
-(s/def ::start ::vector)
-(s/def ::end ::vector)
+(s/def ::start ::v/vector)
+(s/def ::end ::v/vector)
 
 (s/def ::box-selection (s/keys :req-un [::start ::end]))
 
