@@ -9,8 +9,11 @@
 (s/def ::size number?)
 (s/def ::selected boolean?)
 
+(s/def ::selectable (s/keys :req-un [::selected ::translation]))
+
 (s/def ::blob
-  (s/keys :req-un [::translation ::color ::size ::selected])) ;; Require unnamespaced keys
+  (s/and ::selectable
+         (s/keys :req-un [::color ::size]))) ;; Require unnamespaced keys
 
 ;; Test spec
 (let [spec ::blob

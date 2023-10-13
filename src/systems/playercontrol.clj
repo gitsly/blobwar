@@ -13,6 +13,8 @@
 ;;       m12 6]
 ;;   (m/matrix [m00 m01 m02 m10 m11 m12]))
 
+(contains? [1 2] 1)
+
 (defn- system-fn
   [player
    state]
@@ -20,16 +22,22 @@
         inv-matrix (if view-matrix
                      (m/invert view-matrix))]
     (-> state
+        ;; Check if right mouse is dragged then released (selection)
         (systems.events/handle :mouse-released
                                #(let [pressed (-> state :mouse :pressed)
+                                      button (-> pressed :button)
                                       drag {:id :box-selection 
-                                            :start (v/vector
-                                                    (:x pressed)
-                                                    (:y pressed))
-                                            :end (v/vector
-                                                  (:x %)
-                                                  (:y %))}]
-                                  (if (not (= (:start drag) (:end drag))) 
+                                            :start (m/transform inv-matrix
+                                                                (v/vector
+                                                                 (:x pressed)
+                                                                 (:y pressed)))
+                                            :end (m/transform inv-matrix
+                                                              (v/vector
+                                                               (:x %)
+                                                               (:y %)))}]
+                                  (if (and
+                                       (not (= (:start drag) (:end drag)))
+                                       (= button :left)) 
                                     (systems.events/post-event state drag)
                                     state)))
 

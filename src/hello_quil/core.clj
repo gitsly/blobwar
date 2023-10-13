@@ -33,10 +33,10 @@
 ;;   X :selected component for entities,
 ;;   X renderer (blob) for selected or not
 ;;   X spec for :selected and :translation -> ::blob
-;;   - send event from playercontrol
-;;     . include bounds (spec [x1 y1] [x2 y2])
-;;   - selection system
-;;     . check if inside bounds
+;;   X send event from playercontrol
+;;     X include bounds (spec [x1 y1] [x2 y2])
+;;   X selection system
+;;     X check if inside bounds
 ;;   - Deselect (right mouse click)
 ;;
 ;; * Unit commands (via playersystem)

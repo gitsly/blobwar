@@ -20,7 +20,7 @@
   (q/stroke sr sg sb sa)
   (q/stroke-weight stroke)
   (q/ellipse-mode :center)
-  (q/ellipse x y size size))
+  (q/ellipse x y  size size))
 
 (defn draw-blob
   [blob]

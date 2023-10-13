@@ -6,13 +6,14 @@
 
 (defn- draw-text
   [state]
-  (let [text-color [128 128 128]
+  (let [paths [:mouse]
+        text-color [128 128 128]
         text-formatting-width 64
         ;; Use below str for quickly debugging specifics in state
         quick-dbg-str (zp/zprint-str
                        (:debug state)
                        text-formatting-width)
-        state (select-keys state [:graphics-matrix :mouse :event]) ; filter which root keys of state to dbg
+        state (select-keys state paths) ; filter which root keys of state to dbg
         text-content (zp/zprint-str
                       state
                       text-formatting-width)

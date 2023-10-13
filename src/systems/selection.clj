@@ -5,7 +5,8 @@
    [quil.core :as q]
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as m]
-   [clojure.spec.alpha :as s]))
+   [clojure.spec.alpha :as s]
+   [systems.entities]))
 
 ;; TODO: move to vector ecluidian 
 (defn vector2d-data?
@@ -34,14 +35,42 @@
 (s/valid? ::box-selection {:start (v/vector 3  5)
                            :end [1.0 2]})
 
+(max 1 4)
+
+(defn select
+  [entity
+   event]
+  (let [{[x y] :translation} entity
+        {[x1 y1] :start 
+         [x2 y2] :end } event
+
+        ;; Make always left/top to right/bottom box
+        _x1 (min x1 x2)
+        _x2 (max x1 x2)
+        _y1 (min y1 y2)
+        _y2 (max y1 y2)
+
+        selected (if (and (> x _x1) (< x _x2)
+                          (> y _y1) (< y _y2))
+                   true
+                   false)]
+
+    ;; TODO: also check ownership of selectable
+    (assoc entity :selected selected)))
+
+
+(defn on-box-selection
+  [state
+   event]
+  ;;  (println "selection: " event)
+  (-> state
+      (systems.entities/apply-fn-on :entities.blob/selectable #(select % event))))
 
 (defn- system-fn
   [state]
   (-> state
       (systems.events/handle :box-selection
-                             #(do
-                                (println "got" %)
-                                state))))
+                             #(on-box-selection state %))))
 
 (defn- draw-fn
   "Draws selection box in screen space"
@@ -64,10 +93,10 @@
 
 
 (defrecord Sys[definition]
-ecs/EcsSystem ; Realizes the EcsSystem protocol
-(update [data state]
-        (system-fn state))
-(draw [_ state]
-      (draw-fn
-       state)))
+  ecs/EcsSystem ; Realizes the EcsSystem protocol
+  (update [data state]
+    (system-fn state))
+  (draw [_ state]
+    (draw-fn
+     state)))
 

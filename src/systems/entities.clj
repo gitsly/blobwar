@@ -4,6 +4,36 @@
    [ecs.ecssystem :as ecs]
    [clojure.spec.alpha :as s]))
 
+
+(def sample {:entity {:entities (hash-map 0 {:translation [200 100]
+                                             :color [85 128 174 255]
+                                             :selected true 
+                                             :size 10
+                                             :fighting {:weapon "SubLaser"
+                                                        :strength 12.0 }}
+
+                                          1 {:translation [220 110]
+                                             :color [85 72 174 255]
+                                             :selected false 
+                                             :size 8
+                                             :fighting {:weapon "TopLaser"
+                                                        :strength 12.0 }})}})
+
+(defn apply-fn-on
+  "applies fn over set of entities if spec matches, returns new entity hash-map"
+  [state
+   spec
+   entity-fn]
+  (let [entities (-> state :entity :entities)]
+    (assoc-in state [:entity :entities] 
+              (into (hash-map)
+                    (for [[key val] entities]
+                      [key (if (s/valid? spec val)
+                             (entity-fn val)
+                             val)])))))
+
+
+
 (defn add-entity
   [state
    entity]
