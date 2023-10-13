@@ -69,7 +69,7 @@
    :m1-equals-m2 (= m1 m2)
    ;; :m1-type (type m1)
    :mvec (mat/transform m1 a)
-   })
+   :destructured-vector (let [[x y] a] y) })
 
 
 ;;(s/explain ::ecs/system ecs/sample-system)
@@ -224,8 +224,10 @@
 
 (defn- mouse-released
   [state event]
-  (let [button-id (q/mouse-button)] 
+  (let [button-id (q/mouse-button)
+        ev (merge {:id :mouse-released} event)] 
     (-> state
+        (systems.events/post-event ev)      
         (update-in [:mouse :button] #(disj % button-id)))))
 
 (q/defsketch hello-quil

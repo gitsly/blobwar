@@ -7,19 +7,41 @@
    [euclidean.math.matrix :as m]
    [clojure.spec.alpha :as s]))
 
-(s/def ::start (s/coll-of number?))
-(s/def ::end (s/coll-of number?))
+;; TODO: move to vector ecluidian 
+(defn vector2d-data?
+  [data]
+  (let [[x y] data]
+    (if (and (number? x) (number? y))
+      true false)))
+
+
+(s/def ::vector vector2d-data?)
+
+(vector2d-data? [1 2]) ; => true
+(vector2d-data? (v/vector 1 2)) ; => true
+(s/valid? ::vector (v/vector 1 2)); => true
+(s/valid? ::vector [1 ""]); => false
+
+
+(s/def ::start ::vector)
+(s/def ::end ::vector)
 
 (s/def ::box-selection (s/keys :req-un [::start ::end]))
 
 (s/valid? ::box-selection {:start [1.0 2]
                            :end [1.0 2]})
 
+(s/valid? ::box-selection {:start (v/vector 3  5)
+                           :end [1.0 2]})
 
 
 (defn- system-fn
   [state]
-  state)
+  (-> state
+      (systems.events/handle :box-selection
+                             #(do
+                                (println "got" %)
+                                state))))
 
 (defn- draw-fn
   "Draws selection box in screen space"
@@ -42,10 +64,10 @@
 
 
 (defrecord Sys[definition]
-  ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
-    (system-fn state))
-  (draw [_ state]
-    (draw-fn
-     state)))
+ecs/EcsSystem ; Realizes the EcsSystem protocol
+(update [data state]
+        (system-fn state))
+(draw [_ state]
+      (draw-fn
+       state)))
 

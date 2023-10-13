@@ -19,17 +19,32 @@
   (let [view-matrix (:graphics-matrix state)
         inv-matrix (if view-matrix
                      (m/invert view-matrix))]
+    (-> state
+        (systems.events/handle :mouse-released
+                               #(let [pressed (-> state :mouse :pressed)
+                                      drag {:id :box-selection 
+                                            :start (v/vector
+                                                    (:x pressed)
+                                                    (:y pressed))
+                                            :end (v/vector
+                                                  (:x %)
+                                                  (:y %))}]
+                                  (if (not (= (:start drag) (:end drag))) 
+                                    (systems.events/post-event state drag)
+                                    state)))
 
-    (systems.events/handle state :mouse-click
-                           #(let [mp (v/vector (:x %) (:y %))
-                                  p (m/transform inv-matrix mp)
-                                  player-id (:id player)]
+        (systems.events/handle :mouse-click
+                               #(let [mp (v/vector (:x %) (:y %))
+                                      p (m/transform inv-matrix mp)
+                                      player-id (-> player :definition :id)]
 
-                              (if (= (:button %) :left)
-                                (-> state
-                                    (assoc-in [:debug] {:id player-id})
-                                    (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
-                                state)))))
+                                  (if (= (:button %) :left)
+                                    (-> state
+                                        (assoc-in [:debug] {:info "Playerinfo"
+                                                            :player player-id
+                                                            :time (str (-> state :time :last-time))})
+                                        (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
+                                    state))))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
