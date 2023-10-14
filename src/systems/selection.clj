@@ -1,6 +1,7 @@
 (ns systems.selection
   (:require
    [systems.events]
+   [components.common :as c]
    [ecs.ecssystem :as ecs]
    [quil.core :as q]
    [euclidean.math.vector :as v]
@@ -49,7 +50,7 @@
    event]
   ;;  (println "selection: " event)
   (-> state
-      (systems.entities/apply-fn-on :entities.blob/selectable #(select % event))))
+      (systems.entities/apply-fn-on ::c/selectable #(select % event))))
 
 (defn- system-fn
   [state]
