@@ -1,27 +1,26 @@
-(ns systems.blobspawn
+(ns blobwar.systems.blobspawn
   (:require
-   [systems.events]
-   [ecs.ecssystem :as ecs]
-   [systems.events]
-   [systems.entities]
-   [entities.blob]
+   [blobwar.ecs.EcsSystem :as ecs]
+   [blobwar.systems.events :as events]
+   [blobwar.systems.entities :as entities]
+   [blobwar.entities.blob :as blob]
    [clojure.spec.alpha :as s]))
 
 (defn- system-fn
   [state]
   ;; re-frame style?
   ;; event handlers, can be chained... but also mixed with other state updates
-  (systems.events/handle state :spawn-blob
+  (events/handle state :spawn-blob
                          #(do
                             ;;(println "Spawn a blob via event: " %)
-                            (systems.entities/add-entity
-                             state (merge entities.blob/default
+                            (entities/add-entity
+                             state (merge blob/default
                                           {:translation [(:x %) (:y %)] })))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
+  (update-sys [data state]
     (system-fn state))
-  (draw [_ state]
+  (draw-sys [_ state]
     state))
 

@@ -1,11 +1,11 @@
 ;; https://landofquil.clojureverse.org/
-(ns systems.drawing
+(ns blobwar.systems.drawing
   (:require [quil.core :as q]
             [quil.middleware :as m]
-            [ecs.ecssystem :as ecs]
-            [entities.blob]
+            [blobwar.ecs.EcsSystem :as ecs]
+            [blobwar.entities.blob :as blob]
             [clojure.spec.alpha :as s]
-            [systems.entities :as entities]))
+            ))
 
 (def non-selected-color [0 0 0 128])
 (def selected-color [147 235 229 128])
@@ -38,19 +38,19 @@
      stroke-color
      stroke-width)))
 
+
 (defn draw-fn
   [state]
-  (let [drawable-blobs (filter #(s/valid? :entities.blob/blob %)
+  (let [drawable-blobs (filter #(s/valid? ::blob/blob %)
                                (-> state :entity :entities vals))]
     (doseq [blob drawable-blobs]
       (draw-blob blob))))
 
 
-
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [_ state]
+  (update-sys [_ state]
     state)
-  (draw [_ state]
+  (draw-sys [_ state]
     (draw-fn state)
     state))

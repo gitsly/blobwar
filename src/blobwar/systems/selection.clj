@@ -1,13 +1,15 @@
-(ns systems.selection
+(ns blobwar.systems.selection
   (:require
-   [systems.events]
-   [components.common :as c]
-   [ecs.ecssystem :as ecs]
+   [blobwar.components.common :as c]
+   [blobwar.ecs.EcsSystem :as ecs]
+   [blobwar.systems.entities :as entities]
+   [blobwar.systems.events :as events]
+
    [quil.core :as q]
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as m]
    [clojure.spec.alpha :as s]
-   [systems.entities]))
+   ))
 
 
 (s/def ::start ::v/vector)
@@ -50,12 +52,12 @@
    event]
   ;;  (println "selection: " event)
   (-> state
-      (systems.entities/apply-fn-on ::c/selectable #(select % event))))
+      (entities/apply-fn-on ::c/selectable #(select % event))))
 
 (defn- system-fn
   [state]
   (-> state
-      (systems.events/handle :box-selection
+      (events/handle :box-selection
                              #(on-box-selection state %))))
 
 (defn- draw-fn
@@ -80,9 +82,9 @@
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
+  (update-sys [data state]
     (system-fn state))
-  (draw [_ state]
+  (draw-sys [_ state]
     (draw-fn
      state)))
 

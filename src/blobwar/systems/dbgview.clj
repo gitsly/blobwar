@@ -1,8 +1,8 @@
-(ns systems.dbgview
+(ns blobwar.systems.dbgview
   (:require [quil.core :as q]
             [quil.middleware :as m]
             [zprint.core :as zp]
-            [ecs.ecssystem :as ecs]))
+            [blobwar.ecs.EcsSystem :as ecs]))
 
 (defn- draw-text
   [state]
@@ -31,12 +31,11 @@
     (q/text quick-dbg-str 10 240)
     (q/pop-matrix)))
 
-
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
+  (update-sys [data state]
     state)
-  (draw [_ state]
+  (draw-sys [_ state]
     (draw-text state)
     state))
 

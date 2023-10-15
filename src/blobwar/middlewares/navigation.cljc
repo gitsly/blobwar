@@ -1,5 +1,5 @@
 ;; copied the navigation from original quil code and applied needed modifications
-(ns middlewares.navigation
+(ns blobwar.middlewares.navigation
   (:require [quil.core :as q :include-macros true]))
 
 (def ^:private ^String missing-navigation-key-error

@@ -1,7 +1,7 @@
-(ns systems.time
+(ns blobwar.systems.time
   (:require
    [clj-time [core :as t]]
-   [ecs.ecssystem :as ecs]))
+   [blobwar.ecs.EcsSystem :as ecs]))
 
 
 (defn do-time
@@ -23,8 +23,8 @@
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
+  (update-sys [data state]
     (update-time state))
-  (draw [_ state]
+  (draw-sys [_ state]
     state))
 

@@ -1,33 +1,41 @@
-;; ECS game
-;; https://docs.unity3d.com/Packages/com.unity.entities@0.1/manual/ecs_core.html
-(ns hello-quil.core
-  (:require [quil.core :as q]
-            [quil.middleware :as m]
-            ;;            [ecs.ecssystem :refer :all]
-            [ecs.ecssystem :as ecs]
-            [clj-time [core :as t]]
-            [clojure.spec.alpha :as s]
-            [clojure.string :as str]
-            [euclidean.math.vector :as v]
-            [euclidean.math.matrix :as mat]
-            [zprint.core :as zp]
+(ns blobwar.core
+  (:require
+   [clojure.spec.alpha :as s]
+   [clojure.string :as str]
 
-            ;; Custom quil middlewares
-            [middlewares.navigation :as nav]
+   ;; https://landofquil.clojureverse.org/
+   [quil.core :as q]
+   [quil.middleware :as m]
 
-            ;; referenced systems
-            [systems.drawing]
-            [systems.dbgview]
-            [systems.time]
-            [systems.entities]
-            [systems.playercontrol]
-            [systems.events]
-            [systems.mouse]
-            [systems.blobspawn]
-            [systems.events]
-            [systems.selection]
-            [systems.movement]
-            [systems.entities]))
+   [clj-time [core :as t]]
+   [zprint.core :as zp]
+
+   [euclidean.math.vector :as v]
+   [euclidean.math.matrix :as mat]
+
+   ;; Custom quil middlewares
+   [blobwar.middlewares.navigation :as nav]
+
+   ;; Components
+   [blobwar.components.fsm]
+   [blobwar.components.common]
+
+   ;; Entities (functions to apply to entities with specific set of components)
+   [blobwar.entities.blob]
+
+   ;; Systems
+   [blobwar.ecs.EcsSystem :as ecs]
+   [blobwar.systems.dbgview]
+   [blobwar.systems.entities]
+   [blobwar.systems.events]
+   [blobwar.systems.blobspawn]
+   [blobwar.systems.mouse]
+   [blobwar.systems.drawing]
+   [blobwar.systems.movement]
+   [blobwar.systems.playercontrol]
+   [blobwar.systems.selection]
+   [blobwar.systems.time]
+   ))
 
 ;; TODO points
 ;; * Unit selection (via playercontrol)
@@ -45,7 +53,6 @@
 ;; * Save state into JSON, load state...
 ;; *
 
-
 (def gamestate (atom {}))
 
 ;; Sample matrix multiplication
@@ -55,48 +62,25 @@
 (def graphics-matrix (atom nil))
 
 
-;; Vector sample usage
-(let [a (v/vector 2 5)
-      b (v/into-vector [2 5])
-      mfloat [[1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0]]
-      m1 (mat/matrix [1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0])
-      m2 (mat/matrix (vec (flatten mfloat)))]
-  {:normalized (v/normalize a)
-   :magnitude (v/magnitude a)
-   :normlen (v/magnitude (v/normalize a))
-   :x-in-a (v/.getX a)
-   :equal-check (= a b)
-   :m1 m1
-   :m1-equals-m2 (= m1 m2)
-   ;; :m1-type (type m1)
-   :mvec (mat/transform m1 a)
-   :destructured-vector (let [[x y] a] y) })
-
-
-;;(s/explain ::ecs/system ecs/sample-system)
-;;(s/explain ::ecs/system (:definition (Drawing. {:name "name1"})))
-
-
 (def start-state
   {:_INFO "Right mouse to PAN view, mouse wheel to zoom. Left mouse to select"
 
    :systems [
+             (blobwar.systems.dbgview/->Sys "Debug text drawing system")
+             (blobwar.systems.mouse/->Sys "Mouse controller system")
+             (blobwar.systems.time/->Sys "Time system")
+             (blobwar.systems.entities/->Sys "Entity handling system")
+             (blobwar.systems.playercontrol/->Sys {:id "player 1"
+                                                   :description "Player control system"})
+             (blobwar.systems.drawing/->Sys "Drawing system")
+             (blobwar.systems.blobspawn/->Sys "Blob spawning system")
+             (blobwar.systems.selection/->Sys "Selection system")
+             (blobwar.systems.movement/->Sys "Movement system")
 
-             (systems.dbgview/->Sys "Debug text drawing system")
-             (systems.mouse/->Sys "Mouse controller system")
-             (systems.time/->Sys "Time system")
-             (systems.entities/->Sys "Entity handling system")
-             (systems.playercontrol/->Sys {:id "player 1"
-                                           :description "Player control system"})
-             (systems.drawing/->Sys "Drawing system")
-             (systems.blobspawn/->Sys "Blob spawning system")
-             (systems.selection/->Sys "Selection system")
-             (systems.movement/->Sys "Movement system")
-
-             (systems.events/->Sys "Event system")
+             (blobwar.systems.events/->Sys "Event system")
              ]
 
-   :mouse {
+   :mouse {   
            ;; Hash set of buttons pressed
            :button #{}}
    ;;
@@ -123,14 +107,6 @@
    :circle-anim {:color 0
                  :angle 0 }})
 
-
-(let [entity  (-> start-state :entity :entities vals first)
-      {{velocity :velocity
-        max-velocity :max-velocity } :movement
-       translation :translation } entity]
-  (v/add* translation velocity))
-
-
 (defn setup []
   (q/frame-rate 60)
   (q/color-mode :rgb)
@@ -139,37 +115,37 @@
 
 
 (defn update-circle
-[state]
-{:color (mod (+ (:color state) 0.7) 255)
- :angle (+ (:angle state) 0.01) })
+  [state]
+  {:color (mod (+ (:color state) 0.7) 255)
+   :angle (+ (:angle state) 0.01) })
 
 
 (defn do-systems 
-"Calls fn over a set of systems, Assuming EcsSystem realizing"
-[state
- systems
- fn]
-(loop [systems systems
-       state state]
-  (if (empty? systems) 
-    state
-    (recur (rest systems)
-           (fn (first systems) state) ; Let each 'system' update the state
-           ))))
+  "Calls fn over a set of systems, Assuming EcsSystem realizing"
+  [state
+   systems
+   fn]
+  (loop [systems systems
+         state state]
+    (if (empty? systems) 
+      state
+      (recur (rest systems)
+             (fn (first systems) state) ; Let each 'system' update the state
+             ))))
 
 ;; could this be implemented as a system in the ECS domain instead... perhaps...
 
 (defn update-state [state]
 
-(reset! gamestate state)
-;;  (println @graphics-matrix)
-(-> state
-    (do-systems  (:systems state) ecs/update)
+  (reset! gamestate state)
+  ;;  (println @graphics-matrix)
+  (-> state
+      (do-systems  (:systems state) ecs/update-sys)
 
-    (assoc :graphics-matrix @graphics-matrix)
+      (assoc :graphics-matrix @graphics-matrix)
 
-    ;; to get some visual representation in scene... until rendering of entities is complete
-    (update-in  [:circle-anim] update-circle)))
+      ;; to get some visual representation in scene... until rendering of entities is complete
+      (update-in  [:circle-anim] update-circle)))
 
 
 (defn draw-circle
@@ -199,7 +175,7 @@
   ;; TODO: make a system of text drawing.
                                         ;  (draw-text state)
   ;;  (update-state-via-systems ) 
-  (do-systems state (:systems state) ecs/draw)
+  (do-systems state (:systems state) ecs/draw-sys)
 
   ;; Get the current matrix from raw graphics (processing), needs to be done in the draw
   ;; is there a user-draw? somewhere to capture this without atom
@@ -231,41 +207,54 @@
   "Fires an event in the event system"
   [state event]
   (let [ev (merge {:id :mouse-click} event)]
-    (systems.events/post-event state ev)))
+    (blobwar.systems.events/post-event state ev)))
 
 (defn- mouse-released
   [state event]
   (let [button-id (q/mouse-button)
         ev (merge {:id :mouse-released} event)] 
     (-> state
-        (systems.events/post-event ev)      
+        (blobwar.systems.events/post-event ev)      
         (update-in [:mouse :button] #(disj % button-id)))))
 
-(q/defsketch hello-quil
-  :title (str "Blob" " " "War")
-  :size [640 480]
+
+(defn create-sketch
+  [title]
+  (q/sketch  
+   :size [640 480]
+   :title title
+   :renderer :java2d; :opengl ; 
                                         ; setup function called only once, during sketch initialization.
-  :setup setup
+   :setup setup
 
-  :update update-state
-  :draw draw-state
-  :features [:keep-on-top]
+   :update update-state
+   :draw draw-state
+   :features [:keep-on-top]
 
-  ;; Note: the mouse 'system' is fed this info 
-  :mouse-pressed mouse-pressed
-  :mouse-released mouse-released
-  :mouse-dragged mouse-dragged
-  :mouse-clicked mouse-clicked
+   ;; Note: the mouse 'system' is fed this info 
+   :mouse-pressed mouse-pressed
+   :mouse-released mouse-released
+   :mouse-dragged mouse-dragged
+   :mouse-clicked mouse-clicked
 
-  ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
-  :navigation {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
-               :position [320 240]}
+   ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
+   :navigation {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
+                :position [320 240]}
 
-  :middleware [;; This sketch uses functional-mode middleware.
-               ;; Check quil wiki for more info about middlewares and particularly
-               ;; fun-mode.
-               m/fun-mode
+   :middleware [;; This sketch uses functional-mode middleware.
+                ;; Check quil wiki for more info about middlewares and particularly
+                ;; fun-mode.
+                m/fun-mode
 
-               ;; For zooming and mouse control
-               nav/navigation
-               ])
+                ;; For zooming and mouse control
+                nav/navigation
+                ]))
+
+;; Uncomment below and execute to open a new sketch in the CIDER REPL
+;; (create-sketch "Blob war"))
+
+(defn -main
+  "Main entry point"
+  [& args]
+  (println "In the absence of parantheses, chaos prevails")
+  (create-sketch "Blob war"))

@@ -1,8 +1,8 @@
-(ns systems.mouse
+(ns blobwar.systems.mouse
   (:require
    [quil.core :as q]
    [quil.middleware :as m]
-   [ecs.ecssystem :as ecs]))
+   [blobwar.ecs.EcsSystem :as ecs]))
 
 
 (defn- system-fn
@@ -25,8 +25,8 @@
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [data state]
+  (update-sys [data state]
     (update-system state))
-  (draw [_ state]
+  (draw-sys [_ state]
     (draw-fn state)))
 

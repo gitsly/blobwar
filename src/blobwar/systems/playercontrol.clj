@@ -1,7 +1,7 @@
-(ns systems.playercontrol
+(ns blobwar.systems.playercontrol
   (:require
-   [systems.events]
-   [ecs.ecssystem :as ecs]
+   [blobwar.ecs.EcsSystem :as ecs]
+   [blobwar.systems.events :as events]
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as m]))
 
@@ -23,7 +23,7 @@
                      (m/invert view-matrix))]
     (-> state
         ;; Check if right mouse is dragged then released (selection)
-        (systems.events/handle :mouse-released
+        (events/handle :mouse-released
                                #(let [pressed (-> state :mouse :pressed)
                                       button (-> pressed :button)
                                       drag {:id :box-selection 
@@ -38,10 +38,10 @@
                                   (if (and
                                        (not (= (:start drag) (:end drag)))
                                        (= button :left)) 
-                                    (systems.events/post-event state drag)
+                                    (events/post-event state drag)
                                     state)))
 
-        (systems.events/handle :mouse-click
+        (events/handle :mouse-click
                                #(let [mp (v/vector (:x %) (:y %))
                                       p (m/transform inv-matrix mp)
                                       player-id (-> player :definition :id)]
@@ -51,13 +51,13 @@
                                         (assoc-in [:debug] {:info "Playerinfo"
                                                             :player player-id
                                                             :time (str (-> state :time :last-time))})
-                                        (systems.events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
+                                        (events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
                                     state))))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [player state]
+  (update-sys [player state]
     (system-fn player state))
-  (draw [_ state]
+  (draw-sys [_ state]
     state))
 

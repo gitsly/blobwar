@@ -1,7 +1,6 @@
-;; https://landofquil.clojureverse.org/
-(ns systems.events
-  (:require 
-   [ecs.ecssystem :as ecs]
+(ns blobwar.systems.events
+  (:require
+   [blobwar.ecs.EcsSystem :as ecs]
    [clojure.spec.alpha :as s]))
 
 (s/def ::id keyword?)
@@ -14,10 +13,10 @@
    ;; Optional keys
    :req-opt [
              ;; Human readable description of the event (for logs etc)
-             ::description 
+             ::description
 
              ;; Set true when event has been processsed  (one loop)
-             ::processed 
+             ::processed
 
              ;; Optionally set true whenever someone has handled the event, Note:
              ;; many can handle the event, this is only an indication
@@ -78,13 +77,10 @@
       (handler-fn first-matching-event)
       state)))
 
-
-
-
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [_ state]
+  (update-sys [_ state]
     (do-events
      state))
-  (draw [_ state]
+  (draw-sys [_ state]
     state))

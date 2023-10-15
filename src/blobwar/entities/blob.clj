@@ -1,9 +1,7 @@
-(ns entities.blob
+(ns blobwar.entities.blob
   (:require [quil.core :as q]
             [quil.middleware :as m]
-            [ecs.ecssystem :as ecs]
-            [systems.movement]
-            [components.common :as c]
+            [blobwar.components.common :as c]
             [clojure.spec.alpha :as s]))
 
 
@@ -18,7 +16,7 @@
              :selected true
              :color [128 255 0 255]
              :fighting {:weapon "TopLaser"
-                        :strength 12.0 }}] 
+                        :strength 12.0 }}]
   (if (s/valid? spec thing)
     thing
     (s/explain-str spec thing)))

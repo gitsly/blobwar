@@ -1,30 +1,29 @@
-(ns systems.movement
+(ns blobwar.systems.movement
   (:require
-   [components.common :as c]
-   [systems.events]
-   [ecs.ecssystem :as ecs]
+   [blobwar.ecs.EcsSystem :as ecs]
+   [blobwar.systems.entities :as entities]
+   [blobwar.components.common :as c]
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as m]
    [clojure.spec.alpha :as s]
-   [systems.entities]))
+   ))
 
 (defn move-entity
   [entity]
   (let [{{velocity :velocity
           max-velocity :max-velocity } :movement
          translation :translation } entity]
-    ;;  (update entity :translation (v/add* translation velocity)))
     (assoc entity :translation (v/add* translation velocity))))
 
 (defn- system-fn
   [state]
   (-> state
-      (systems.entities/apply-fn-on ::c/moving move-entity)))
+      (entities/apply-fn-on ::c/moving move-entity)))
 
 (defrecord Sys[definition]
   ecs/EcsSystem
-  (update [data state]
+  (update-sys [data state]
     (system-fn state))
-  (draw [_ state]
+  (draw-sys [_ state]
     state))
 

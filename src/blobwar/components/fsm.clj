@@ -1,7 +1,7 @@
-                                        ; BDD = Behavior
-                                        ; Inpiration from here: https://github.com/unclebob/spacewar/blob/master/src/spacewar/game_logic/klingons.cljc
-                                        ; And here: https://blog.cleancoder.com/uncle-bob/2018/06/06/PickledState.html
-(ns components.fsm
+;; BDD = Behavior
+;; Inpiration from here: https://github.com/unclebob/spacewar/blob/master/src/spacewar/game_logic/klingons.cljc
+;; And here: https://blog.cleancoder.com/uncle-bob/2018/06/06/PickledState.html
+(ns blobwar.components.fsm
   (:require [clojure.spec.alpha :as s]))
 
 ;; Gherkin (testing language?), GWT
@@ -74,9 +74,7 @@
         new-state (if (and (= :refuel cruise-state)
                            (< antimatter 40))
                     :refuel
-                    (do
-                      (println "Input to FSM: state:" cruise-state ", transition(event):" transition)
-                      (-> klingon-fsm cruise-state transition)))]
+                      (-> klingon-fsm cruise-state transition))]
     (assoc klingon :cruise-state new-state)))
 
 ;; Test above

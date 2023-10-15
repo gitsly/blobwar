@@ -1,20 +1,19 @@
-;; https://landofquil.clojureverse.org/
-(ns systems.entities
-  (:require 
-   [ecs.ecssystem :as ecs]
+(ns blobwar.systems.entities
+  (:require
+   [blobwar.ecs.EcsSystem :as ecs]
    [clojure.spec.alpha :as s]))
 
 
 (def sample {:entity {:entities (hash-map 0 {:translation [200 100]
                                              :color [85 128 174 255]
-                                             :selected true 
+                                             :selected true
                                              :size 10
                                              :fighting {:weapon "SubLaser"
                                                         :strength 12.0 }}
 
                                           1 {:translation [220 110]
                                              :color [85 72 174 255]
-                                             :selected false 
+                                             :selected false
                                              :size 8
                                              :fighting {:weapon "TopLaser"
                                                         :strength 12.0 }})}})
@@ -25,7 +24,7 @@
    spec
    entity-fn]
   (let [entities (-> state :entity :entities)]
-    (assoc-in state [:entity :entities] 
+    (assoc-in state [:entity :entities]
               (into (hash-map)
                     (for [[key val] entities]
                       [key (if (s/valid? spec val)
@@ -54,8 +53,8 @@
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update [_ state]
+  (update-sys [_ state]
     (do-entities
      state))
-  (draw [_ state]
+  (draw-sys [_ state]
     state))

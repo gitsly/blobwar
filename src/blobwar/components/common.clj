@@ -1,7 +1,7 @@
 ;; Note: when using outside this file :components.common/xyz
 ;; or when in combination with :as
 ;; ::c/xyz
-(ns components.common
+(ns blobwar.components.common
   (:require
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as m]
