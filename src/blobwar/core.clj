@@ -25,6 +25,7 @@
    [blobwar.systems.blobspawn]
    [blobwar.systems.mouse]
    [blobwar.systems.drawing]
+   [blobwar.systems.movement]
    ))
 
 (println "core")
