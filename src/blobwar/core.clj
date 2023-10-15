@@ -23,6 +23,8 @@
    [blobwar.systems.entities]
    [blobwar.systems.events]
    [blobwar.systems.blobspawn]
+
+   [blobwar.systems.drawing]
    ))
 
 (println "core")
