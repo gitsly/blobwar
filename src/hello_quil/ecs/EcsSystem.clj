@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]))
 
-(println "another")
+(println "hello-quil.ecs.EcsSystem")
 
 (defprotocol EcsSystem
   "A EcsSystem. Takes the entire ESC state and performs the systems

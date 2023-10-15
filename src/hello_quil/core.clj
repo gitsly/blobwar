@@ -1,7 +1,14 @@
 (ns hello-quil.core
   (:require
    [clojure.string :as str]
-   [hello-quil.ecs.EcsSystem]))
+
+   [euclidean.math.vector :as v]
+   [euclidean.math.matrix :as mat]
+
+
+   [hello-quil.ecs.EcsSystem]
+
+   ))
 
 (println "core")
 

@@ -5,7 +5,6 @@
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [quil "3.1.0"]
                  [zprint "1.2.8"]
-                 [euclidean "0.2.0"]
                  [clj-time "0.15.2"]]
 
   :main ^:skip-aot hello-quil.core

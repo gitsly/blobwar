@@ -2,6 +2,8 @@
   (:require  [clojure.spec.alpha :as s])
   (:refer-clojure :exclude [vector]))
 
+(println "euclidean.math.vector")
+
 (defn- add-hashcode [hash x]
   (+ hash (* 37 hash) (Float/floatToIntBits x)))
 
