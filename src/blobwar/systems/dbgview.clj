@@ -6,7 +6,7 @@
 
 (defn- draw-text
   [state]
-  (let [paths [:mouse]
+  (let [paths [:mouse :owner :graphics-matrix]
         text-color [128 128 128]
         text-formatting-width 64
         ;; Use below str for quickly debugging specifics in state

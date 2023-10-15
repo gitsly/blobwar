@@ -70,8 +70,8 @@
              (blobwar.systems.mouse/->Sys "Mouse controller system")
              (blobwar.systems.time/->Sys "Time system")
              (blobwar.systems.entities/->Sys "Entity handling system")
-             (blobwar.systems.playercontrol/->Sys {:id "player 1"
-                                                   :description "Player control system"})
+             ;;             (blobwar.systems.playercontrol/->Sys {:id "player 1"
+             ;;                                                   :description "Player control system"})
              (blobwar.systems.drawing/->Sys "Drawing system")
              (blobwar.systems.blobspawn/->Sys "Blob spawning system")
              (blobwar.systems.selection/->Sys "Selection system")
@@ -107,11 +107,14 @@
    :circle-anim {:color 0
                  :angle 0 }})
 
-(defn setup []
+(defn setup
+  [setup-parameters]
   (q/frame-rate 60)
   (q/color-mode :rgb)
   (q/text-font (q/create-font "Hack" 12 true))
-  start-state)
+  (merge 
+   start-state
+   setup-parameters))
 
 
 (defn update-circle
@@ -138,7 +141,6 @@
 (defn update-state [state]
 
   (reset! gamestate state)
-  ;;  (println @graphics-matrix)
   (-> state
       (do-systems  (:systems state) ecs/update-sys)
 
@@ -172,10 +174,9 @@
 
 (defn draw-state [state]
   (q/background 240)
-  ;; TODO: make a system of text drawing.
-                                        ;  (draw-text state)
-  ;;  (update-state-via-systems ) 
   (do-systems state (:systems state) ecs/draw-sys)
+
+  ;;(println "hep" @graphics-matrix)
 
   ;; Get the current matrix from raw graphics (processing), needs to be done in the draw
   ;; is there a user-draw? somewhere to capture this without atom
@@ -187,7 +188,6 @@
                               (.-m10 matrix)
                               (.-m11 matrix)
                               (.-m12 matrix)])))
-
 
   (draw-circle (:circle-anim state)))
 
@@ -219,16 +219,17 @@
 
 
 (defn create-sketch
-  [title]
+  [title
+   setup-parameters]
   (q/sketch  
    :size [640 480]
    :title title
    :renderer :java2d; :opengl ; 
                                         ; setup function called only once, during sketch initialization.
-   :setup setup
+   :setup (fn [] (setup setup-parameters))
 
-   :update update-state
-   :draw draw-state
+   :update (fn [state] (update-state state))
+   :draw (fn[state] (draw-state state))
    :features [:keep-on-top]
 
    ;; Note: the mouse 'system' is fed this info 
@@ -251,10 +252,10 @@
                 ]))
 
 ;; Uncomment below and execute to open a new sketch in the CIDER REPL
-;; (create-sketch "Blob war"))
+(create-sketch "Blob war" {:owner :player-1 })
 
 (defn -main
   "Main entry point"
   [& args]
   (println "In the absence of parantheses, chaos prevails")
-  (create-sketch "Blob war"))
+  (create-sketch "Blob war" {:owner :player-1 }))
