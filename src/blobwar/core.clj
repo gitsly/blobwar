@@ -5,6 +5,9 @@
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as mat]
 
+   ;; Custom quil middlewares
+   [blobwar.middlewares.navigation :as nav]
+
    ;; Components
    [blobwar.components.fsm]
    [blobwar.components.common]
