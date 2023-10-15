@@ -2,6 +2,8 @@
   (:require
    [clojure.string :as str]
 
+   ;; https://landofquil.clojureverse.org/
+
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as mat]
 
@@ -18,6 +20,9 @@
    ;; Systems
    [blobwar.ecs.EcsSystem]
    [blobwar.systems.dbgview]
+   [blobwar.systems.entities]
+   [blobwar.systems.events]
+   [blobwar.systems.blobspawn]
    ))
 
 (println "core")
