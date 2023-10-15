@@ -250,8 +250,7 @@
                 nav/navigation
                 ]))
 
-(println *ns*)
-(defonce main-repl-sketch (create-sketch "Blob war (REPL)"))
+(create-sketch "Blob war (REPL)")
 
 (defn -main
   "Main entry point"
