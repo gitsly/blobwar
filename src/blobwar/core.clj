@@ -6,6 +6,7 @@
    [euclidean.math.matrix :as mat]
 
    [blobwar.ecs.EcsSystem]
+   [blobwar.systems.dbgview]
    ))
 
 (println "core")
