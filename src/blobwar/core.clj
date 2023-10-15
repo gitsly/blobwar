@@ -250,7 +250,8 @@
                 nav/navigation
                 ]))
 
-(create-sketch "Blob war (REPL)")
+;; Uncomment below and execute to open a new sketch in the CIDER REPL
+;; (create-sketch "Blob war"))
 
 (defn -main
   "Main entry point"

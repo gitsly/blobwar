@@ -7,8 +7,6 @@
             [clojure.spec.alpha :as s]
             ))
 
-(println *ns*)
-
 (def non-selected-color [0 0 0 128])
 (def selected-color [147 235 229 128])
 

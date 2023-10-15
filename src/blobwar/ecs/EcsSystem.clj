@@ -2,8 +2,6 @@
   (:require
    [clojure.string :as str]))
 
-(println "blobwar.ecs.EcsSystem")
-
 (defprotocol EcsSystem
   "A EcsSystem. Takes the entire ESC state and performs the systems
   actions upon it. Returns the updated state"
