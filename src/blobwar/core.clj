@@ -23,7 +23,7 @@
    [blobwar.systems.entities]
    [blobwar.systems.events]
    [blobwar.systems.blobspawn]
-
+   [blobwar.systems.mouse]
    [blobwar.systems.drawing]
    ))
 
