@@ -26,6 +26,7 @@
    [blobwar.systems.mouse]
    [blobwar.systems.drawing]
    [blobwar.systems.movement]
+   [blobwar.systems.playercontrol]
    ))
 
 (println "core")
