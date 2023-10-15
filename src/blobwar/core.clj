@@ -5,6 +5,11 @@
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as mat]
 
+   ;; Components
+   [blobwar.components.fsm]
+   [blobwar.components.common]
+
+   ;; Systems
    [blobwar.ecs.EcsSystem]
    [blobwar.systems.dbgview]
    ))
