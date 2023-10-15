@@ -1,8 +1,6 @@
-(ns hello-quil.another
+(ns hello-quil.ecs.another
   (:require
    [clojure.string :as str]))
-
-;;(def something "apa")
 
 (println "another")
 
