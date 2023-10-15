@@ -1,8 +1,14 @@
 (ns blobwar.core
   (:require
+   [clojure.spec.alpha :as s]
    [clojure.string :as str]
 
    ;; https://landofquil.clojureverse.org/
+   [quil.core :as q]
+   [quil.middleware :as m]
+
+   [clj-time [core :as t]]
+   [zprint.core :as zp]
 
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as mat]
