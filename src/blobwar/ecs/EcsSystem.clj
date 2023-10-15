@@ -1,8 +1,8 @@
-(ns hello-quil.ecs.EcsSystem
+(ns blobwar.ecs.EcsSystem
   (:require
    [clojure.string :as str]))
 
-(println "hello-quil.ecs.EcsSystem")
+(println "blobwar.ecs.EcsSystem")
 
 (defprotocol EcsSystem
   "A EcsSystem. Takes the entire ESC state and performs the systems

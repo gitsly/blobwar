@@ -1,13 +1,11 @@
-(ns hello-quil.core
+(ns blobwar.core
   (:require
    [clojure.string :as str]
 
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as mat]
 
-
-   [hello-quil.ecs.EcsSystem]
-
+   [blobwar.ecs.EcsSystem]
    ))
 
 (println "core")
