@@ -1,7 +1,7 @@
 (ns hello-quil.core
   (:require
    [clojure.string :as str]
-   [hello-quil.ecs.another]))
+   [hello-quil.ecs.EcsSystem]))
 
 (println "core")
 

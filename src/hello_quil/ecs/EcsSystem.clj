@@ -1,4 +1,4 @@
-(ns hello-quil.ecs.another
+(ns hello-quil.ecs.EcsSystem
   (:require
    [clojure.string :as str]))
 
@@ -7,5 +7,5 @@
 (defprotocol EcsSystem
   "A EcsSystem. Takes the entire ESC state and performs the systems
   actions upon it. Returns the updated state"
-  (update [this state] "Update state in system, returns new state")
-  (draw [this state] "System called during draw portion of engine"))
+  (update-sys [this state] "Update state in system, returns new state")
+  (draw-sys [this state] "System called during draw portion of engine"))
