@@ -27,6 +27,8 @@
    [blobwar.systems.drawing]
    [blobwar.systems.movement]
    [blobwar.systems.playercontrol]
+   [blobwar.systems.selection]
+   [blobwar.systems.time]
    ))
 
 (println "core")
