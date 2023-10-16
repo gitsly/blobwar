@@ -29,7 +29,6 @@
    [blobwar.systems.entities]
    [blobwar.systems.events]
    [blobwar.systems.blobspawn]
-   [blobwar.systems.mouse]
    [blobwar.systems.drawing]
    [blobwar.systems.movement]
    [blobwar.systems.playercontrol]
@@ -55,23 +54,15 @@
 
 (def gamestate (atom {}))
 
-;; Sample matrix multiplication
-;; [m00 m01 m02][x]   [m00*x + m01*y + m02*1]   [x']
-;; [m10 m11 m12][y] = [m10*x + m11*y + m12*1] = [y']
-;; [ 0   0   1 ][1]   [ 0*x  +  0*y  +  1*1 ]   [1 ]
-(def graphics-matrix (atom nil))
-
 
 (def start-state
   {:_INFO "Right mouse to PAN view, mouse wheel to zoom. Left mouse to select"
 
    :systems [
              (blobwar.systems.dbgview/->Sys "Debug text drawing system")
-             (blobwar.systems.mouse/->Sys "Mouse controller system")
              (blobwar.systems.time/->Sys "Time system")
              (blobwar.systems.entities/->Sys "Entity handling system")
-             ;;             (blobwar.systems.playercontrol/->Sys {:id "player 1"
-             ;;                                                   :description "Player control system"})
+             (blobwar.systems.playercontrol/->Sys {:id :player-1 :description "Player control system"})
              (blobwar.systems.drawing/->Sys "Drawing system")
              (blobwar.systems.blobspawn/->Sys "Blob spawning system")
              (blobwar.systems.selection/->Sys "Selection system")
@@ -80,9 +71,10 @@
              (blobwar.systems.events/->Sys "Event system")
              ]
 
-   :mouse {   
-           ;; Hash set of buttons pressed
-           :button #{}}
+   ;;:mouse {   
+   ;;        ;; Hash set of buttons pressed
+   ;;        :button #{}}
+
    ;;
    ;; Hash map of entities composing the game-world
    ;; each entity has  
@@ -138,58 +130,69 @@
 
 ;; could this be implemented as a system in the ECS domain instead... perhaps...
 
-(defn update-state [state]
+(defn get-actor-data
+  [nav]
+  (let [root :actors
+        width (q/width)
+        height (q/height)
+        {zoom :zoom
+         pos :position } nav
+        scale (mat/scale (mat/mat3) zoom)
+        [px py] pos 
+        trans (v/vector
+               (- (/ width 2 zoom) px)
+               (- (/ height 2 zoom) py))
+        translation (mat/translate (mat/mat3) trans)
+        view-matrix (mat/mult* scale translation)
+        res {:view view-matrix
+             :view-inv (mat/invert view-matrix)
+             :width width
+             :height height
+             }]
+    res))
 
+
+(defn update-state
+  [state]
   (reset! gamestate state)
   (-> state
       (do-systems  (:systems state) ecs/update-sys)
 
-      (assoc :graphics-matrix @graphics-matrix)
+      (update-in [:actors (:owner state)] #(merge % (get-actor-data (:navigation state))))
+      (assoc-in [:actors (:owner state) :mouse :x] (q/mouse-x))
+      (assoc-in [:actors (:owner state) :mouse :y] (q/mouse-y))
 
       ;; to get some visual representation in scene... until rendering of entities is complete
       (update-in  [:circle-anim] update-circle)))
 
 
 (defn draw-circle
-  [state]
-  (q/fill (:color state) 255 255 128)
-  (q/stroke 0 0 0 128)
-  (q/stroke-weight 2)
+[state]
+(q/fill (:color state) 255 255 128)
+(q/stroke 0 0 0 128)
+(q/stroke-weight 2)
                                         ; Calculate x and y coordinates of the circle.
-  (let [angle (:angle state)
-        x (* 150 (q/cos angle))
-        y (* 150 (q/sin angle))
-        sz (* 200 (q/sin angle))]
+(let [angle (:angle state)
+      x (* 150 (q/cos angle))
+      y (* 150 (q/sin angle))
+      sz (* 200 (q/sin angle))]
                                         ; Move origin point to the center of the sketch.
 
-    (q/with-translation [(/ (q/width) 2)
-                         (/ (q/height) 2)]
+(q/with-translation [(/ (q/width) 2)
+                     (/ (q/height) 2)]
                                         ; Draw the circle.
-      (q/ellipse x y 100 100))
+  (q/ellipse x y 100 100))
 
-    (q/with-translation [(+ 120 (/ (q/width) 2))
-                         (/ (q/height) 2)]
+(q/with-translation [(+ 120 (/ (q/width) 2))
+                     (/ (q/height) 2)]
                                         ; Draw the circle.
-      (q/ellipse x y sz 200))))
+  (q/ellipse x y sz 200))))
 
 (defn draw-state [state]
   (q/background 240)
   (do-systems state (:systems state) ecs/draw-sys)
-
-  ;;(println "hep" @graphics-matrix)
-
-  ;; Get the current matrix from raw graphics (processing), needs to be done in the draw
-  ;; is there a user-draw? somewhere to capture this without atom
-  (reset! graphics-matrix (mat/matrix 
-                           (let [matrix (.getMatrix (q/current-graphics))]
-                             [(.-m00 matrix)
-                              (.-m01 matrix)
-                              (.-m02 matrix)
-                              (.-m10 matrix)
-                              (.-m11 matrix)
-                              (.-m12 matrix)])))
-
   (draw-circle (:circle-anim state)))
+
 
 (defn- mouse-dragged
   [state event]
@@ -198,10 +201,13 @@
 
 (defn- mouse-pressed
   [state event]
-  (let [button-id (q/mouse-button)] 
+  (let [button-id (q/mouse-button)
+        path [:actors (:owner state) :mouse]] 
+    ;;(println "pressed: " path)
     (-> state
-        (assoc-in [:mouse :pressed] event)
-        (update-in [:mouse :button] #(conj % button-id)))))
+        (assoc-in (conj path :pressed) event)
+        (update-in (conj path :button) #(into (hash-set) (conj % button-id))))))
+
 
 (defn- mouse-clicked
   "Fires an event in the event system"
@@ -212,11 +218,12 @@
 (defn- mouse-released
   [state event]
   (let [button-id (q/mouse-button)
+        path [:actors (:owner state) :mouse :button]
         ev (merge {:id :mouse-released} event)] 
+    ;;(println "released: " path)
     (-> state
         (blobwar.systems.events/post-event ev)      
-        (update-in [:mouse :button] #(disj % button-id)))))
-
+        (update-in path #(into (hash-set) (disj % button-id))))))
 
 (defn create-sketch
   [title
@@ -238,7 +245,7 @@
    :mouse-dragged mouse-dragged
    :mouse-clicked mouse-clicked
 
-   ;; navigation-2d options. Note: this data is also passed along in the state!, nice...
+   ;; navigation options. Note: this data is also passed along in the state!, nice...
    :navigation {:zoom 1 ; when zoom is less than 1.0, we're zoomed out, and > 1.0 is zoomed in
                 :position [320 240]}
 
@@ -251,11 +258,14 @@
                 nav/navigation
                 ]))
 
-;; Uncomment below and execute to open a new sketch in the CIDER REPL
-(create-sketch "Blob war" {:owner :player-1 })
+
+;; update navigation middleware to get matrix, or calculate it
 
 (defn -main
   "Main entry point"
   [& args]
   (println "In the absence of parantheses, chaos prevails")
   (create-sketch "Blob war" {:owner :player-1 }))
+
+;; Uncomment below and execute to open a new sketch in the CIDER REPL
+(create-sketch "Blob war" {:owner :player-1 })

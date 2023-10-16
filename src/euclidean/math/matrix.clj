@@ -8,6 +8,7 @@
   (^:no-doc mult* [m1 m2] "Multiply one matrix by another.")
   (negate [m] "Negates each component of the input matrix.")
   (invert [m] "Inverts the input matrix.")
+  (scale [m s] "Scales the matrix")
   (^double determinant [m] "Returns the determinant of the input matrix.")
   (transpose [m] "Returns the transpose of the input matrix."))
 
@@ -21,7 +22,7 @@
   (mult-identity [x] "Returns the multiplicative identity of the input."))
 
 (defprotocol TranslateBy
-  (translate [v m] "Translate the matrix by the given vector."))
+  (translate [m v] "Translate the matrix by the given vector."))
 
 (defmacro ^:private hash-matrix-fields
   [& fields]
@@ -111,6 +112,16 @@
         (let [det-inv (/ det)]
           (Matrix2D. (* m11 det-inv) (- (* m01 det-inv))
                      (- (* m10 det-inv)) (* m00 det-inv))))))
+
+  (scale [m2 s]
+    ;; m00 *= sx;  m01 *= sy;
+    ;; m10 *= sx;  m11 *= sy;
+    (let [m2 ^Matrix2D m2
+          sx s
+          sy s]
+      (Matrix2D. (* sx (.-m00 m2)) (* sy (.-m01 m2))
+                 (* sx (.-m10 m2)) (* sy (.-m11 m2)))))
+
   (determinant [_]
     (- (* m00 m11) (* m10 m01)))
   (transpose [_]
@@ -232,7 +243,18 @@
        (* m10 (- (* m21 m02) (* m01 m22)))
        (* m20 (- (* m01 m12) (* m11 m02)))))
   (transpose [_]
-    (Matrix3D. m00 m10 m20 m01 m11 m21 m02 m12 m22)))
+    (Matrix3D. m00 m10 m20 m01 m11 m21 m02 m12 m22))
+
+  (scale [m s]
+    (let [sx s
+          sy s
+          sz s]
+      (Matrix3D. (* sx (.-m00 m)) (* sy (.-m01 m)) (.-m02 m)
+                 (* sx (.-m10 m)) (* sy (.-m11 m)) (.-m12 m)
+                 (* sx (.-m20 m)) (* sy (.-m21 m)) (.-m22 m)
+                 ))
+    )
+  )
 
 (definline det3
   [m00# m10# m20# m01# m11# m21# m02# m12# m22#]
@@ -261,6 +283,18 @@
   (add-identity [_] (Matrix3D. 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0))
   MultiplicativeIdentity
   (mult-identity [_] identity-mat3)
+
+  TranslateBy
+  (translate [^Matrix3D m ^Vector2D v]
+    "Translate the matrix by the given vector."
+    (let [[tx ty] v]
+      ;;    [m00 m01 m02]
+      ;;    [m10 m11 m12]      ;; m02 = tx*m00 + ty*m01 + m02;
+      ;;    [ 0   0   1 ]      ;; m12 = tx*m10 + ty*m11 + m12;
+      (Matrix3D. (.-m00 m) (.-m01 m) (+ (* tx (.-m00 m)) (* ty (.-m01 m)) (.-m02 m))
+                 (.-m10 m) (.-m11 m) (+ (* tx (.-m10 m)) (* ty (.-m11 m)) (.-m12 m))
+                 (.-m20 m) (.-m21 m) (.-m22 m)
+                 )))
 
   TransformVector
   (transform [^Matrix3D m ^Vector2D v ]

@@ -6,9 +6,9 @@
 
 (defn- draw-text
   [state]
-  (let [paths [:mouse :owner :graphics-matrix]
+  (let [paths [:mouse :owner :navigation :actors]
         text-color [128 128 128]
-        text-formatting-width 64
+        text-formatting-width 54
         ;; Use below str for quickly debugging specifics in state
         quick-dbg-str (zp/zprint-str
                        (:debug state)
@@ -24,7 +24,7 @@
     (q/reset-matrix) ; Loads the identity matrix
     (q/fill text-color)
     (q/text text-content
-            10
+            0
             10)
 
     (q/fill [255 0 0])
