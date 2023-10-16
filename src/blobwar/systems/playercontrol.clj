@@ -49,9 +49,7 @@
                                          (:y %)))}]
             (if (and (not (= (:start drag) (:end drag)))
                      (= button :left)) 
-              (do
-                (println "Posting" drag)
-                (events/post-event state drag))
+              (events/post-event state drag)
               state)
             ;;(println {:event %
             ;;          :pressed pressed })

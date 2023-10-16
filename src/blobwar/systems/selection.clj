@@ -23,7 +23,6 @@
 (s/valid? ::box-selection {:start (v/vector 3  5)
                            :end [1.0 2]})
 
-(max 1 4)
 
 (defn select
   [entity
@@ -50,7 +49,7 @@
 (defn on-box-selection
   [state
    event]
-  ;;  (println "selection: " event)
+  (println "selection: " event)
   (-> state
       (entities/apply-fn-on ::c/selectable #(select % event))))
 
@@ -62,29 +61,32 @@
 
 (defn- draw-fn
   "Draws selection box in screen space"
-  [state]
-  (q/push-matrix)
-  (q/reset-matrix) ; Loads the identity matrix
-  (q/stroke 0 0 0 200)
-  (q/fill 0 0 0 10)
-  (if (contains? (-> state :mouse :button) :left)
-    (do
-      (let [x1 (get-in state [:mouse :pressed :x])
-            y1 (get-in state [:mouse :pressed :y])
-            x2 (get-in state [:mouse :x])
-            y2 (get-in state [:mouse :y])
-            width (- x2 x1)
-            height (- y2 y1)]
-        (q/rect x1 y1 width height))))
-  (q/pop-matrix)
-  state)
+  [state
+   sys]
+  (let [actor-id (-> sys :definition :id)
+        actor (get-in state [:actors actor-id])]
+    (q/push-matrix)
+    (q/reset-matrix) ; Loads the identity matrix
+    (q/stroke 0 0 0 200)
+    (q/fill 0 0 0 10)
+    (if (contains? (-> actor :mouse :button) :left)
+      (do
+        (let [x1 (get-in actor [:mouse :pressed :x])
+              y1 (get-in actor [:mouse :pressed :y])
+              x2 (get-in actor [:mouse :x])
+              y2 (get-in actor [:mouse :y])
+              width (- x2 x1)
+              height (- y2 y1)]
+          (q/rect x1 y1 width height))))
+    (q/pop-matrix)
+    state))
 
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
   (update-sys [data state]
     (system-fn state))
-  (draw-sys [_ state]
+  (draw-sys [sys state]
     (draw-fn
-     state)))
+     state sys)))
 

@@ -65,7 +65,7 @@
              (blobwar.systems.playercontrol/->Sys {:id :player-1 :description "Player control system"})
              (blobwar.systems.drawing/->Sys "Drawing system")
              (blobwar.systems.blobspawn/->Sys "Blob spawning system")
-             (blobwar.systems.selection/->Sys "Selection system")
+             (blobwar.systems.selection/->Sys {:id :player-1 :description "Selection system"})
              (blobwar.systems.movement/->Sys "Movement system")
 
              (blobwar.systems.events/->Sys "Event system")
