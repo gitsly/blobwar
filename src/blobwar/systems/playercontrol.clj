@@ -32,25 +32,24 @@
             (if (= (:button %) :left)
               (do
                 (println ": clicked" ev)
-                (events/post-event state ev))
-              state)))
+                (events/post-event state ev)))))
 
         (events/handle
          :mouse-released
          #(let [pressed (-> actor :mouse :pressed)
                 button (-> pressed :button)
-                drag {:id :box-selection 
-                      :start (m/transform inv-view-matrix
-                                          (v/vector
-                                           (:x pressed)
-                                           (:y pressed)))
-                      :end (m/transform inv-view-matrix
+                ev {:id :box-selection 
+                    :start (m/transform inv-view-matrix
                                         (v/vector
-                                         (:x %)
-                                         (:y %)))}]
-            (if (and (not (= (:start drag) (:end drag)))
+                                         (:x pressed)
+                                         (:y pressed)))
+                    :end (m/transform inv-view-matrix
+                                      (v/vector
+                                       (:x %)
+                                       (:y %)))}]
+            (if (and (not (= (:start ev) (:end ev)))
                      (= button :left)) 
-              (events/post-event state drag)
+              (events/post-event state ev)
               state)))
         )
     ))
