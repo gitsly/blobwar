@@ -2,6 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [clojure.string :as str]
+   [clojure.data.json :as json]
 
    ;; https://landofquil.clojureverse.org/
    [quil.core :as q]
@@ -53,6 +54,11 @@
 ;; *
 
 (def gamestate (atom {}))
+
+;;(let [gs @gamestate
+;;      ;; TODO: need Joda.Time. parser stuff...
+;;      json (json/write-str gs)]
+;;  (spit "c://tmp//blobstate.json" json))
 
 
 (def start-state
@@ -167,26 +173,26 @@
 
 
 (defn draw-circle
-[state]
-(q/fill (:color state) 255 255 128)
-(q/stroke 0 0 0 128)
-(q/stroke-weight 2)
+  [state]
+  (q/fill (:color state) 255 255 128)
+  (q/stroke 0 0 0 128)
+  (q/stroke-weight 2)
                                         ; Calculate x and y coordinates of the circle.
-(let [angle (:angle state)
-      x (* 150 (q/cos angle))
-      y (* 150 (q/sin angle))
-      sz (* 200 (q/sin angle))]
+  (let [angle (:angle state)
+        x (* 150 (q/cos angle))
+        y (* 150 (q/sin angle))
+        sz (* 200 (q/sin angle))]
                                         ; Move origin point to the center of the sketch.
 
-(q/with-translation [(/ (q/width) 2)
-                     (/ (q/height) 2)]
+    (q/with-translation [(/ (q/width) 2)
+                         (/ (q/height) 2)]
                                         ; Draw the circle.
-  (q/ellipse x y 100 100))
+      (q/ellipse x y 100 100))
 
-(q/with-translation [(+ 120 (/ (q/width) 2))
-                     (/ (q/height) 2)]
+    (q/with-translation [(+ 120 (/ (q/width) 2))
+                         (/ (q/height) 2)]
                                         ; Draw the circle.
-  (q/ellipse x y sz 200))))
+      (q/ellipse x y sz 200))))
 
 (defn draw-state [state]
   (q/background 240)

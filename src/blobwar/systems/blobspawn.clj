@@ -13,9 +13,12 @@
   (events/handle state :spawn-blob
                  #(do
                     (println "Spawn a blob via event: " %)
-                    (entities/add-entity
-                     state (merge blob/default
-                                  {:translation [(:x %) (:y %)] })))))
+                    ;;                    (entities/add-entity
+                    ;;                     state (merge blob/default
+                    ;;                                  {:translation [(:x %) (:y %)] }))
+                    state
+
+                    )))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol

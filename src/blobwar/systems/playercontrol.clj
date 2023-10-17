@@ -23,19 +23,17 @@
         inv-view-matrix (:view-inv actor)]
     ;;(println actor)
     (-> state
-        ;; Check if right mouse is dragged then released (selection)
-        (events/handle
-         :mouse-click
-         #(let [mp (v/vector (:x %) (:y %))
-                [px py] (m/transform inv-view-matrix mp)
-                ev {:id :spawn-blob :x px :y py }]
-            (if (= (:button %) :left)
-              (do
-                (println ": clicked" ev)
-                (events/post-event state ev)))))
+
+        ;;        (events/handle
+        ;;         :mouse-click
+        ;;         #(let [mp (v/vector (:x %) (:y %))
+        ;;                [px py] (m/transform inv-view-matrix mp)
+        ;;                ev {:id :spawn-blob :x px :y py }]
+        ;;            (if (= (:button %) :left)
+        ;;              (events/post-event state ev))))
 
         (events/handle
-         :mouse-released
+         :mouse-released ; Check if right mouse is dragged then released (selection)
          #(let [pressed (-> actor :mouse :pressed)
                 button (-> pressed :button)
                 ev {:id :box-selection 
@@ -49,8 +47,7 @@
                                        (:y %)))}]
             (if (and (not (= (:start ev) (:end ev)))
                      (= button :left)) 
-              (events/post-event state ev)
-              state)))
+              (events/post-event state ev))))
         )
     ))
 
