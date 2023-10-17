@@ -6,7 +6,7 @@
 
 (defn- draw-text
   [state]
-  (let [paths [:mouse :owner :navigation :actors]
+  (let [paths [:entity]
         text-color [128 128 128]
         text-formatting-width 54
         ;; Use below str for quickly debugging specifics in state

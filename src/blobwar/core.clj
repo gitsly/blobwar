@@ -28,6 +28,7 @@
    ;; Systems
    [blobwar.ecs.EcsSystem :as ecs]
    [blobwar.systems.dbgview]
+   [blobwar.systems.command]
    [blobwar.systems.events]
    [blobwar.systems.blobspawn]
    [blobwar.systems.drawing]
@@ -72,6 +73,7 @@
              (blobwar.systems.blobspawn/->Sys "Blob spawning system")
              (blobwar.systems.selection/->Sys {:id :player-1 :description "Selection system"})
              (blobwar.systems.movement/->Sys "Movement system")
+             (blobwar.systems.command/->Sys "Command system" )
 
              (blobwar.systems.events/->Sys "Event system")
              ]

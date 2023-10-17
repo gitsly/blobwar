@@ -4,7 +4,8 @@
    [blobwar.systems.events :as events]
    [blobwar.entities.utils :as eu]
    [blobwar.entities.blob :as blob]
-   [clojure.spec.alpha :as s]))
+   [clojure.spec.alpha :as s]
+   [euclidean.math.vector :as v]))
 
 (defn- system-fn
   [state]
@@ -12,10 +13,14 @@
   ;; event handlers, can be chained... but also mixed with other state updates
   (events/handle state :spawn-blob
                  #(do
-                    (println "Spawn a blob via event: " %)
+                    ;;(println "Spawn a blob via event: " %)
                     (eu/add-entity
                      state (merge blob/default
-                                  {:translation [(:x %) (:y %)] }))
+                                  {:translation [(:x %) (:y %)]
+
+                                   :commands [{:target (v/vector 0 0)}]
+
+                                   }))
 
                     )))
 
