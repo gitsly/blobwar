@@ -23,11 +23,11 @@
 
    ;; Entities (functions to apply to entities with specific set of components)
    [blobwar.entities.blob]
+   [blobwar.entities.utils]
 
    ;; Systems
    [blobwar.ecs.EcsSystem :as ecs]
    [blobwar.systems.dbgview]
-   [blobwar.systems.entities]
    [blobwar.systems.events]
    [blobwar.systems.blobspawn]
    [blobwar.systems.drawing]
@@ -67,7 +67,6 @@
    :systems [
              (blobwar.systems.dbgview/->Sys "Debug text drawing system")
              (blobwar.systems.time/->Sys "Time system")
-             (blobwar.systems.entities/->Sys "Entity handling system")
              (blobwar.systems.playercontrol/->Sys {:id :player-1 :description "Player control system"})
              (blobwar.systems.drawing/->Sys "Drawing system")
              (blobwar.systems.blobspawn/->Sys "Blob spawning system")

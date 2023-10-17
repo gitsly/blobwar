@@ -2,7 +2,7 @@
   (:require
    [blobwar.components.common :as c]
    [blobwar.ecs.EcsSystem :as ecs]
-   [blobwar.systems.entities :as entities]
+   [blobwar.entities.utils :as eu]
    [blobwar.systems.events :as events]
 
    [quil.core :as q]
@@ -51,7 +51,7 @@
    event]
   ;;  (println "selection: " event)
   (-> state
-      (entities/apply-fn-on ::c/selectable #(select % event))))
+      (eu/apply-fn-on ::c/selectable #(select % event))))
 
 (defn- system-fn
   [state]

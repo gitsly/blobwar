@@ -1,8 +1,7 @@
-(ns blobwar.systems.entities
+;; Utility functions for dealing with entities
+(ns blobwar.entities.utils
   (:require
-   [blobwar.ecs.EcsSystem :as ecs]
    [clojure.spec.alpha :as s]))
-
 
 (def sample {:entity {:entities (hash-map 0 {:translation [200 100]
                                              :color [85 128 174 255]
@@ -41,20 +40,3 @@
                     (merge entities (hash-map next-id entity)))]
     (-> state
         (update-in [:entity :entities] insert-fn))))
-
-;;(s/def ::drawable-blob
-;;  (s/keys :req-un [::translation ::color ::size])) ;; Require unnamespaced keys
-(defn- do-entities
-  "Do handling of entities in respect to game-engine"
-  [state]
-  (let [next-id (count (get-in state [:entity :entities]))]
-    (-> state
-        (assoc-in [:entity :next-entity-id] next-id))))
-
-(defrecord Sys[definition]
-  ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update-sys [_ state]
-    (do-entities
-     state))
-  (draw-sys [_ state]
-    state))

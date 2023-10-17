@@ -2,7 +2,7 @@
   (:require
    [blobwar.ecs.EcsSystem :as ecs]
    [blobwar.systems.events :as events]
-   [blobwar.systems.entities :as entities]
+   [blobwar.entities.utils :as eu]
    [blobwar.entities.blob :as blob]
    [clojure.spec.alpha :as s]))
 
@@ -12,8 +12,8 @@
   ;; event handlers, can be chained... but also mixed with other state updates
   (events/handle state :spawn-blob
                  #(do
-                    ;;(println "Spawn a blob via event: " %)
-                    (entities/add-entity
+                    (println "Spawn a blob via event: " %)
+                    (eu/add-entity
                      state (merge blob/default
                                   {:translation [(:x %) (:y %)] }))
 
