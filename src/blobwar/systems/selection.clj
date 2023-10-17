@@ -57,7 +57,7 @@
   [state]
   (-> state
       (events/handle :box-selection
-                             #(on-box-selection state %))))
+                     #(on-box-selection state %))))
 
 (defn- draw-fn
   "Draws selection box in screen space"

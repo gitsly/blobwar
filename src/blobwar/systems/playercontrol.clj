@@ -18,7 +18,6 @@
   [player
    state]
 
-
   (let [player-id (-> player :definition :id)
         actor (get-in state [:actors player-id])
         inv-view-matrix (:view-inv actor)]
@@ -28,10 +27,12 @@
         (events/handle
          :mouse-click
          #(let [mp (v/vector (:x %) (:y %))
-                p (m/transform inv-view-matrix mp)]
+                [px py] (m/transform inv-view-matrix mp)
+                ev {:id :spawn-blob :x px :y py }]
             (if (= (:button %) :left)
-              (-> state
-                  (events/post-event {:id :spawn-blob :x (v/.getX p) :y (v/.getY p)}))
+              (do
+                (println ": clicked" ev)
+                (events/post-event state ev))
               state)))
 
         (events/handle
@@ -50,10 +51,7 @@
             (if (and (not (= (:start drag) (:end drag)))
                      (= button :left)) 
               (events/post-event state drag)
-              state)
-            ;;(println {:event %
-            ;;          :pressed pressed })
-            state))
+              state)))
         )
     ))
 

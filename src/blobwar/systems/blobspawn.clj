@@ -11,11 +11,11 @@
   ;; re-frame style?
   ;; event handlers, can be chained... but also mixed with other state updates
   (events/handle state :spawn-blob
-                         #(do
-                            ;;(println "Spawn a blob via event: " %)
-                            (entities/add-entity
-                             state (merge blob/default
-                                          {:translation [(:x %) (:y %)] })))))
+                 #(do
+                    (println "Spawn a blob via event: " %)
+                    (entities/add-entity
+                     state (merge blob/default
+                                  {:translation [(:x %) (:y %)] })))))
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
