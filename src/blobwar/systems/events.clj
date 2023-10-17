@@ -44,7 +44,7 @@
   "Adds the passed event to the list, checks event validity before adding"
   [state
    event]
-  (println "Post event: " event)
+  ;;(println "Post event: " event)
   (if (s/valid? ::event event)
     (update-in state [:event :events] #(conj % event))
     state))

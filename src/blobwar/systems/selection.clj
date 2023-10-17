@@ -49,7 +49,7 @@
 (defn on-box-selection
   [state
    event]
-  (println "selection: " event)
+  ;;  (println "selection: " event)
   (-> state
       (entities/apply-fn-on ::c/selectable #(select % event))))
 
