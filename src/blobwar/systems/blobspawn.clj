@@ -12,11 +12,10 @@
   ;; event handlers, can be chained... but also mixed with other state updates
   (events/handle state :spawn-blob
                  #(do
-                    (println "Spawn a blob via event: " %)
-                    ;;                    (entities/add-entity
-                    ;;                     state (merge blob/default
-                    ;;                                  {:translation [(:x %) (:y %)] }))
-                    state
+                    ;;(println "Spawn a blob via event: " %)
+                    (entities/add-entity
+                     state (merge blob/default
+                                  {:translation [(:x %) (:y %)] }))
 
                     )))
 

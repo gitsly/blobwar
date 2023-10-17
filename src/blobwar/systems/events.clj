@@ -46,11 +46,7 @@
    event]
   (println "Post event: " event)
   (if (s/valid? ::event event)
-    (let [new-state (update-in state [:event :events]
-                               #(conj % event))]
-      (if (nil? new-state)
-        state
-        new-state))
+    (update-in state [:event :events] #(conj % event))
     state))
 
 (defn- get-events
@@ -78,7 +74,10 @@
    handler-fn]
   (let [first-matching-event (first (filter #(and (= (:id %) event-id)) (get-events state)))]
     (if (some? first-matching-event)
-      (handler-fn first-matching-event)
+      (let [new-state (handler-fn first-matching-event)]
+        (if (nil? new-state)
+          state
+          new-state))
       state)))
 
 (defrecord Sys[definition]
