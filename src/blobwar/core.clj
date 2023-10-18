@@ -93,10 +93,10 @@
                                               :strength 12.0 }
 
                                    :movement {:velocity (v/vector 0.02 0)
-                                              :accel (v/vector 0 0)
-                                              :max-velocity 5 }}
+                                              :accel (v/vector 0.005 0)
+                                              :max-velocity 1.2 }}
 
-                                1 {:translation (v/vector 220 110)
+                                1 {:translation (v/vector 20 110)
                                    :color [85 72 174 255]
                                    :selected false 
                                    :size 8

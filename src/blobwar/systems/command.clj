@@ -17,16 +17,20 @@
 (s/def ::commands (s/coll-of ::command))
 
 ;; TODO: move spec to some better location?
-(s/def ::commanded (s/keys :req-un [::commands]))
+(s/def ::commanded (s/keys :req-un [::commands :c/translation]))
 
 (defn command-entity
   [entity]
-  ;;  (let [{{velocity :velocity
-  ;;          max-velocity :max-velocity } :movement
-  ;;         translation :translation } entity]
-  ;;    (assoc entity :translation (v/add* translation velocity)))
-  ;;  (println "commanded" entity)
-  entity)
+  (let [{target :target} (-> entity :commands first)
+        translation (:translation entity)
+        vec-to-target nil]
+    
+    ;;  (let [{{velocity :velocity
+    ;;          max-velocity :max-velocity } :movement
+    ;;         translation :translation } entity]
+    ;;    (assoc entity :translation (v/add* translation velocity)))
+    ;;
+    entity))
 
 (defn- system-fn
   [sys
