@@ -17,6 +17,12 @@
                                              :fighting {:weapon "TopLaser"
                                                         :strength 12.0 }})}})
 
+(defn get-entities
+  [state
+   spec]
+  (let [entities (-> state :entity :entities vals)]
+    (filter #(s/valid? spec %) entities)))
+
 (defn apply-fn-on
   "applies fn over set of entities if spec matches, returns new entity hash-map"
   [state

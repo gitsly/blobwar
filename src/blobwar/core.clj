@@ -19,11 +19,11 @@
 
    ;; Components
    [blobwar.components.fsm]
-   [blobwar.components.common]
+   [blobwar.components.common :as c]
 
    ;; Entities (functions to apply to entities with specific set of components)
    [blobwar.entities.blob]
-   [blobwar.entities.utils]
+   [blobwar.entities.utils :as eu]
 
    ;; Systems
    [blobwar.ecs.EcsSystem :as ecs]
@@ -62,6 +62,10 @@
 ;;  (spit "c://tmp//blobstate.json" json))
 
 
+
+;;(filter #(= (:owner %) :player-1) 
+;;        (eu/get-entities @gamestate ::c/selectable))
+
 (def start-state
   {:_INFO "Right mouse to PAN view, mouse wheel to zoom. Left mouse to select"
 
@@ -85,23 +89,17 @@
    ;;
    ;; Hash map of entities composing the game-world
    ;; each entity has  
-   :entity {:entities (hash-map 0 {:translation (v/vector 200 100)
+   :entity {:entities (hash-map 0 {:owner :player-1
+                                   :translation (v/vector 200 100)
                                    :color [85 128 174 255]
                                    :selected true 
-                                   :size 10
-                                   :fighting {:weapon "SubLaser"
-                                              :strength 12.0 }
-
-                                   :movement {:velocity (v/vector 0.02 0)
-                                              :accel (v/vector 0.005 0)
-                                              :max-velocity 1.2 }}
-
-                                1 {:translation (v/vector 20 110)
+                                   :size 10 }
+                                1 {:owner :player-1
+                                   :translation (v/vector 20 110)
                                    :color [85 72 174 255]
                                    :selected false 
-                                   :size 8
-                                   :fighting {:weapon "TopLaser"
-                                              :strength 12.0 }})}
+                                   :size 8}
+                                )}
 
    :circle-anim {:color 0
                  :angle 0 }})

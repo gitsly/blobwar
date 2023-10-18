@@ -16,11 +16,13 @@
                     ;;(println "Spawn a blob via event: " %)
                     (eu/add-entity
                      state (merge blob/default
-                                  {:translation [(:x %) (:y %)]
-
-                                   :commands [{:target (v/vector 0 0)}]
-
-                                   }))
+                                  (let [{x :x
+                                         y :y
+                                         owner :owner} %]
+                                    {:owner owner
+                                     :translation (v/vector x y)
+                                     :commands [{:target (v/vector 0 0)}]
+                                     })))
 
                     )))
 

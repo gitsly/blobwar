@@ -2,6 +2,8 @@
   (:require
    [blobwar.ecs.EcsSystem :as ecs]
    [blobwar.systems.events :as events]
+   [blobwar.entities.utils :as eu]
+   [blobwar.components.common :as c]
    [euclidean.math.vector :as v]
    [euclidean.math.matrix :as m]
    [zprint.core :as zp]))
@@ -32,10 +34,22 @@
   [state
    actor
    event]
-  (let [inv-view-matrix (:view-inv actor)
+  (let [player-id (:owner state)
+        inv-view-matrix (:view-inv actor)
         mp (v/vector (:x event) (:y event))
         [px py] (m/transform inv-view-matrix mp)
-        ev {:id :spawn-blob :x px :y py }]
+        ev {:id :spawn-blob
+            :owner (:owner state)
+            :x px :y py }
+        selected-entities (filter #(and (= (:owner %) player-id)
+                                        (:selected %)) 
+                                  (eu/get-entities state ::c/selectable))
+        ]
+
+    ;; TODO: fix check of if any selected entities, then give command if such.
+    ;; otherwise, FSM? for deploy troop (masterstate, needs to be handled maybe more superstate ish)
+    (println "selected entities" selected-entities)
+
     (if (= (:button event) :left)
       (events/post-event state ev))))
 

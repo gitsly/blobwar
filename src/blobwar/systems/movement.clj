@@ -9,15 +9,17 @@
    ))
 
 (defn check-and-apply-moving-component
-  [entity])
-(assoc entity :translation (v/add* translation velocity))
+  [entity]
+  (assoc entity :movement {:velocity (v/vector 0.02 0)
+                           :accel (v/vector 0.005 0)
+                           :max-velocity 1.2 }))
 
 (defn move-entity
-  [entity]
-  (let [{{velocity :velocity
-          max-velocity :max-velocity } :movement
-         translation :translation } entity]
-    (assoc entity :translation (v/add* translation velocity))))
+[entity]
+(let [{{velocity :velocity
+        max-velocity :max-velocity } :movement
+       translation :translation } entity]
+  (assoc entity :translation (v/add* translation velocity))))
 
 (defn apply-accel
   [velocity
