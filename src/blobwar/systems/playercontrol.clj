@@ -46,6 +46,10 @@
 (eu/get-entities player-control-test1 ::c/selectable)
 (sel/get-selected-entities player-control-test1 :player-1)
 
+(keys
+ (filter #(:selected (val %)) 
+         (eu/get-entity-kv player-control-test1 ::c/selectable)))
+
 (defn on-mouse-click
   [state
    actor
@@ -56,15 +60,24 @@
         mp (v/vector (:x event) (:y event))
         [px py] (m/transform inv-view-matrix mp)
 
-        
-        selected-entities (sel/get-selected-entities state player-id)
-        no-selection? (empty? selected-entities)]
+        selected-entity-kvs (filter #(:selected (val %)) 
+                                    (eu/get-entity-kv state ::c/selectable))
+        no-selection? (empty? selected-entity-kvs)]
+
+
 
     (if (= (:button event) :left) 
       (-> state 
+          ;; If having entities selected, then give 'command'
           (events/if-do (not no-selection?)
-                        #(println "command entities" selected-entities %))
+                        #(events/post-event % {:id :command
+                                               :command {:target (v/vector px py)
+                                                         :action :move }
+                                               :owner (:owner state)
+                                               :entities (keys selected-entity-kvs)}))
 
+          ;; DEBUG: otherwise, spawn a blob...
+          ;; (if none selected)
           (events/if-do no-selection?
                         #(events/post-event % {:id :spawn-blob
                                                :owner (:owner state) :x px :y py }))
@@ -82,48 +95,48 @@
 
 
 (defn on-mouse-dragged
-  [state
-   actor
-   event]
-  (let [inv-view-matrix (:view-inv actor)
-        pressed (-> actor :mouse :pressed)
-        button (-> pressed :button)
-        ev {:id :box-selection 
-            :start (m/transform inv-view-matrix
-                                (v/vector
-                                 (:x pressed)
-                                 (:y pressed)))
-            :end (m/transform inv-view-matrix
+[state
+ actor
+ event]
+(let [inv-view-matrix (:view-inv actor)
+      pressed (-> actor :mouse :pressed)
+      button (-> pressed :button)
+      ev {:id :box-selection 
+          :start (m/transform inv-view-matrix
                               (v/vector
-                               (:x event)
-                               (:y event)))}]
-    (if (and (not (= (:start ev) (:end ev)))
-             (= button :left)) 
-      (events/post-event state ev))))
+                               (:x pressed)
+                               (:y pressed)))
+          :end (m/transform inv-view-matrix
+                            (v/vector
+                             (:x event)
+                             (:y event)))}]
+  (if (and (not (= (:start ev) (:end ev)))
+           (= button :left)) 
+    (events/post-event state ev))))
 
 
 
 
 
 (defn- system-fn
-  [player
-   state]
-  (let [player-id (-> player :definition :id)
-        actor (get-in state [:actors player-id])]
-    (-> state
-        (events/handle :mouse-released #(on-mouse-dragged state actor %))
-        (events/handle :mouse-click #(on-mouse-click state actor %))
-        )
-    ))
+[player
+ state]
+(let [player-id (-> player :definition :id)
+      actor (get-in state [:actors player-id])]
+  (-> state
+      (events/handle :mouse-released #(on-mouse-dragged state actor %))
+      (events/handle :mouse-click #(on-mouse-click state actor %))
+      )
+  ))
 
 ;; released, click -> works
 ;; click, released -> only drag works
 ;; solo -> both works separately
 
 (defrecord Sys[definition]
-  ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update-sys [player state]
-    (system-fn player state))
-  (draw-sys [_ state]
-    state))
+ecs/EcsSystem ; Realizes the EcsSystem protocol
+(update-sys [player state]
+            (system-fn player state))
+(draw-sys [_ state]
+          state))
 

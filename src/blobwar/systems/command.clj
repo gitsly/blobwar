@@ -32,10 +32,29 @@
     ;;
     entity))
 
+(defn on-command
+  [state
+   command]
+  (println "Command received" command)
+  state)
+
+
+(let [col (hash-map 0 :a 1 :b 2 :c)
+      s [0 2]]
+  (for [i s]
+    (get col i)))
+
+;;(get (hash-map 0 :a 1 :b) 0)
+
+
 (defn- system-fn
   [sys
    state]
   (-> state
+      ;; Receieve new commands
+      (events/handle :command #(on-command state %))
+
+      ;; Update all commanded units
       (eu/apply-fn-on ::commanded command-entity)))
 
 ;; released, click -> works
@@ -43,9 +62,9 @@
 ;; solo -> both works separately
 
 (defrecord Sys[definition]
-  ecs/EcsSystem ; Realizes the EcsSystem protocol
-  (update-sys [sys state]
-    (system-fn sys state))
-  (draw-sys [_ state]
-    state))
+ecs/EcsSystem ; Realizes the EcsSystem protocol
+(update-sys [sys state]
+            (system-fn sys state))
+(draw-sys [_ state]
+          state))
 

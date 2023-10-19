@@ -36,6 +36,18 @@
                              (entity-fn val)
                              val)])))))
 
+(defn get-entity-kv
+  "Returns key value hash-map of entities matching spec"
+  [state
+   spec]
+  (let [entities (-> state :entity :entities)]
+    (into (hash-map )
+          (filter #(s/valid? spec (val %)) entities))))
+
+;;(into (hash-map )
+;;      (filter #(do 
+;;                 (println (val %))
+;;                 (< 1 (val %))) (hash-map :a 1 :b 2 )))
 
 
 (defn add-entity
