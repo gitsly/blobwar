@@ -23,6 +23,13 @@
 (s/valid? ::box-selection {:start (v/vector 3  5)
                            :end [1.0 2]})
 
+(defn get-selected-entities
+  [state
+   player-id]
+  (filter #(and (= (:owner %) player-id)
+                (:selected %)) 
+          (eu/get-entities state ::c/selectable)))
+
 
 (defn select
   [entity

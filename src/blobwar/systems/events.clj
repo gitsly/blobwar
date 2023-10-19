@@ -40,6 +40,39 @@
 (def sample-state { :event {:events sample-events}})
 ;;(map #(s/valid? ::event %) sample-events)
 
+
+;; TODO: could this be a macro?, move to some utils
+;; Sample usage
+;; (-> 1
+;;     (if-do false inc)
+;;     (if-do true #(println "fn taking in " % " returning nil"))
+;;     (if-do true dec))
+(defn if-do
+  "If pred evals true apply fn over state, otherwise return state.
+  Also if do-fn would return nil, then return supplied state instead"
+  [state
+   pred ; thruthy?
+   do-fn]
+  (if pred
+    (let [ret (do-fn state)]
+      (if (nil? ret)
+        state
+        ret))
+    state))
+
+
+;; TODO: Unit test
+(-> 1
+    (if-do false inc)
+    (if-do true #(println "fn taking in " % " returning nil"))
+    (if-do false (fn[v]
+                   (println "shouldn't be printed")
+                   (if (< 1 v)
+                     (* v 5))))
+
+    (if-do true dec))
+
+
 (defn post-event
   "Adds the passed event to the list, checks event validity before adding"
   [state

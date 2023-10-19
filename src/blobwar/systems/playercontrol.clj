@@ -2,6 +2,7 @@
   (:require
    [blobwar.ecs.EcsSystem :as ecs]
    [blobwar.systems.events :as events]
+   [blobwar.systems.selection :as sel]
    [blobwar.entities.utils :as eu]
    [blobwar.components.common :as c]
    [euclidean.math.vector :as v]
@@ -18,40 +19,67 @@
 (get-in {:heppas {:test 12}} [:heppas :test])
 
 
-(def player-control-test1
-  {:actors
-   {:player-1
-    {:height 480,
-     :mouse {:button #{},
-             :pressed {:button :left, :x 275, :y 219},
-             :x 275,
-             :y 219},
-     :view (m/matrix [1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0]),
-     :view-inv (m/matrix [1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0])
-     :width 640}}})
+(def player-control-test1 {:owner :player-1
+                           :entity {:entities (hash-map 0 {:owner :player-1
+                                                           :translation (v/vector 200 100)
+                                                           :color [85 128 174 255]
+                                                           :selected true 
+                                                           :size 10 }
+                                                        1 {:owner :player-1
+                                                           :translation (v/vector 20 110)
+                                                           :color [85 72 174 255]
+                                                           :selected false 
+                                                           :size 8}
+                                                        )}
+                           :actors
+                           {:player-1
+                            {
+                             :height 480,
+                             :mouse {:button #{},
+                                     :pressed {:button :left, :x 275, :y 219},
+                                     :x 275,
+                                     :y 219},
+                             :view (m/matrix [1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0]),
+                             :view-inv (m/matrix [1.0 0.0 0.0] [0.0 1.0 0.0] [0.0 0.0 1.0])
+                             :width 640}}})
+
+(eu/get-entities player-control-test1 ::c/selectable)
+(sel/get-selected-entities player-control-test1 :player-1)
 
 (defn on-mouse-click
   [state
    actor
    event]
-  (let [player-id (:owner state)
+  (let [
+        player-id (:owner state)
         inv-view-matrix (:view-inv actor)
         mp (v/vector (:x event) (:y event))
         [px py] (m/transform inv-view-matrix mp)
-        ev {:id :spawn-blob
-            :owner (:owner state)
-            :x px :y py }
-        selected-entities (filter #(and (= (:owner %) player-id)
-                                        (:selected %)) 
-                                  (eu/get-entities state ::c/selectable))
-        ]
 
-    ;; TODO: fix check of if any selected entities, then give command if such.
-    ;; otherwise, FSM? for deploy troop (masterstate, needs to be handled maybe more superstate ish)
-    (println "selected entities" selected-entities)
+        
+        selected-entities (sel/get-selected-entities state player-id)
+        no-selection? (empty? selected-entities)]
 
-    (if (= (:button event) :left)
-      (events/post-event state ev))))
+    (if (= (:button event) :left) 
+      (-> state 
+          (events/if-do (not no-selection?)
+                        #(println "command entities" selected-entities %))
+
+          (events/if-do no-selection?
+                        #(events/post-event % {:id :spawn-blob
+                                               :owner (:owner state) :x px :y py }))
+          ))
+    )
+  )
+
+
+;; TODO unit test
+(let [state player-control-test1
+      actor (-> state :actors :player-1)
+      event {:x 249 :y 241 :button :left
+             }] 
+  (on-mouse-click state actor event))
+
 
 (defn on-mouse-dragged
   [state
@@ -72,6 +100,9 @@
     (if (and (not (= (:start ev) (:end ev)))
              (= button :left)) 
       (events/post-event state ev))))
+
+
+
 
 
 (defn- system-fn
