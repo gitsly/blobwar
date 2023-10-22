@@ -274,7 +274,7 @@
   (create-sketch "Blob war" {:owner :player-1 }))
 
 ;; Uncomment below and execute to open a new sketch in the CIDER REPL
-;;(create-sketch "Blob war" {:owner :player-1 })
+(create-sketch "Blob war" {:owner :player-1 })
 
 ;; Haze command
 ;;  Startup: /usr/bin/lein update-in :dependencies conj \[nrepl/nrepl\ \"1.0.0\"\] -- update-in :dependencies conj \[refactor-nrepl/refactor-nrepl\ \"3.9.0\"\] -- update-in :plugins conj \[refactor-nrepl/refactor-nrepl\ \"3.9.0\"\] -- update-in :plugins conj \[cider/cider-nrepl\ \"0.40.0\"\] -- repl :headless :host localhost

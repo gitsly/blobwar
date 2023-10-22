@@ -35,8 +35,11 @@
 (defn on-command
   [state
    command]
-  (println "Command received" command)
-  state)
+  (let [keys (apply vector (:entities command))] 
+    (eu/apply-fn-on-keys state keys
+                         (fn[ent]
+                           (println "Command received:" ent)
+                           ent))))
 
 
 (let [col (hash-map 0 :a 1 :b 2 :c)
