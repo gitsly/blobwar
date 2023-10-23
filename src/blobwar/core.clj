@@ -55,7 +55,7 @@
 ;; *
 
 (def gamestate (atom {}))
-;;(println @gamestate)
+(zp/zprint @gamestate)
 
 ;;(let [gs @gamestate
 ;;      ;; TODO: need Joda.Time. parser stuff...

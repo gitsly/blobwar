@@ -6,7 +6,7 @@
 
 (defn- draw-text
   [state]
-  (let [paths [:entity]
+  (let [paths []
         text-color [128 128 128]
         text-formatting-width 54
         ;; Use below str for quickly debugging specifics in state
