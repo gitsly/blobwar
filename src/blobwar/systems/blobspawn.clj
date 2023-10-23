@@ -21,7 +21,7 @@
                                          owner :owner} %]
                                     {:owner owner
                                      :translation (v/vector x y)
-                                     :commands [{:target (v/vector 0 0)}]
+                                     ;;:commands [{:target (v/vector 0 0)}]
                                      })))
 
                     )))

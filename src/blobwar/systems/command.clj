@@ -20,34 +20,36 @@
 (s/def ::commanded (s/keys :req-un [::commands :c/translation]))
 
 (defn command-entity
+  "Fn applied to each commanded unit every update loop"
   [entity]
-  (let [{target :target} (-> entity :commands first)
+  (let [cmd (-> entity :commands first)
+        {target :target} cmd
         translation (:translation entity)
-        vec-to-target nil]
-    
-    ;;  (let [{{velocity :velocity
-    ;;          max-velocity :max-velocity } :movement
-    ;;         translation :translation } entity]
-    ;;    (assoc entity :translation (v/add* translation velocity)))
-    ;;
-    entity))
+        vec-to-target (v/normalize (v/sub* target translation))]
+
+    ;; TODO:
+    ;; 1. Add check or add movecomponent to create defaults...
+    ;; 2. Remove 'command' from list once target reach, make a fn for target reached condition.
+    (-> entity
+        (update-in [:movement :velocity] #(if (nil? %)
+                                            (v/vector 0 0)
+                                            %))
+        (update :movement #(merge % {:accel vec-to-target
+                                     :max-velocity 0.5 })))    
+    ;;(println vec-to-target)
+
+    ))
 
 (defn on-command
+  "When receiving command"
   [state
    command]
-  (let [keys (apply vector (:entities command))] 
-    (eu/apply-fn-on-keys state keys
-                         (fn[ent]
-                           (println "Command received:" ent)
-                           ent))))
+  (let [keys (apply vector (:entities command))
+        add-command (fn[entity
+                        command]
+                      (update-in entity [:commands] #(conj % command)))] 
+    (eu/apply-fn-on-keys state keys #(add-command % command))))
 
-
-(let [col (hash-map 0 :a 1 :b 2 :c)
-      s [0 2]]
-  (for [i s]
-    (get col i)))
-
-;;(get (hash-map 0 :a 1 :b) 0)
 
 
 (defn- system-fn

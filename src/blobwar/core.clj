@@ -90,12 +90,14 @@
    ;;
    ;; Hash map of entities composing the game-world
    ;; each entity has  
-   :entity {:entities (hash-map 0 {:owner :player-1
+   :entity {:entities (hash-map 0 {:name "Entity1"
+                                   :owner :player-1
                                    :translation (v/vector 200 100)
                                    :color [85 128 174 255]
                                    :selected true 
                                    :size 10 }
-                                1 {:owner :player-1
+                                1 {:name "Unselected"
+                                   :owner :player-1
                                    :translation (v/vector 20 110)
                                    :color [85 72 174 255]
                                    :selected false 

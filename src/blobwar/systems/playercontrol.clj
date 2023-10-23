@@ -71,8 +71,8 @@
           ;; If having entities selected, then give 'command'
           (events/if-do (not no-selection?)
                         #(events/post-event % {:id :command
-                                               :command {:target (v/vector px py)
-                                                         :action :move }
+                                               :target (v/vector px py)
+                                               :action :move
                                                :owner (:owner state)
                                                :entities (keys selected-entity-kvs)}))
 
