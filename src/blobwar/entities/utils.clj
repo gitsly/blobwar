@@ -1,6 +1,7 @@
 ;; Utility functions for dealing with entities
 (ns blobwar.entities.utils
   (:require
+   [utils.core :as u]
    [clojure.spec.alpha :as s]))
 
 (def sample {:entity {:entities (hash-map 0 {:translation [200 100]
@@ -54,7 +55,7 @@
     (assoc-in state [:entity :entities]
               (into (hash-map)
                     (for [[key val] entities]
-                      [key (if (contains? keys key)
+                      [key (if (u/in? keys key)
                              (entity-fn val)
                              val)])))))
 
