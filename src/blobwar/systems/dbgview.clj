@@ -8,12 +8,18 @@
   [state]
   (let [paths []
         text-color [128 128 128]
-        text-formatting-width 54
+        text-formatting-width 64
         ;; Use below str for quickly debugging specifics in state
         quick-dbg-str (zp/zprint-str
                        (:debug state)
                        text-formatting-width)
-        state (select-keys state paths) ; filter which root keys of state to dbg
+
+        ;;        state (select-keys state paths) ; filter which root keys of state to dbg
+        state (map (fn[[key entity]]
+                     {:name (str (:name entity) "[" key "]")
+                      :commands (count (:commands entity))
+                      :selected (:selected entity)})  (-> state :entity :entities))
+
         text-content (zp/zprint-str
                       state
                       text-formatting-width)
