@@ -32,6 +32,7 @@
    [blobwar.systems.events]
    [blobwar.systems.blobspawn]
    [blobwar.systems.drawing]
+   [blobwar.systems.distance]
    [blobwar.systems.movement]
    [blobwar.systems.playercontrol]
    [blobwar.systems.selection]
@@ -55,7 +56,17 @@
 ;; *
 
 (def gamestate (atom {}))
-(zp/zprint @gamestate)
+;;(zp/zprint @gamestate)
+
+;;(->> (json/read-str (slurp "c:\\tmp\\signals.json") :key-fn keyword)
+;;     :Operations
+;;     (map #(vector (:Index %)
+;;                   (:ProcessValueName %)))
+;;     (into (hash-map)))
+
+
+;;(json/read-str "{\"a\":1,\"b\":2}"
+;;               :key-fn keyword)
 
 ;;(let [gs @gamestate
 ;;      ;; TODO: need Joda.Time. parser stuff...
@@ -78,6 +89,7 @@
              (blobwar.systems.blobspawn/->Sys "Blob spawning system")
              (blobwar.systems.selection/->Sys {:id :player-1 :description "Selection system"})
              (blobwar.systems.movement/->Sys "Movement system")
+             (blobwar.systems.distance/->Sys "Distance system")
              (blobwar.systems.command/->Sys "Command system" )
 
              (blobwar.systems.events/->Sys "Event system")
@@ -108,13 +120,13 @@
                  :angle 0 }})
 
 (defn setup
-  [setup-parameters]
-  (q/frame-rate 60)
-  (q/color-mode :rgb)
-  (q/text-font (q/create-font "Hack" 12 true))
-  (merge 
-   start-state
-   setup-parameters))
+[setup-parameters]
+(q/frame-rate 60)
+(q/color-mode :rgb)
+(q/text-font (q/create-font "Hack" 12 true))
+(merge 
+start-state
+setup-parameters))
 
 
 (defn update-circle
@@ -276,7 +288,6 @@
   (create-sketch "Blob war" {:owner :player-1 }))
 
 ;; Uncomment below and execute to open a new sketch in the CIDER REPL
-(create-sketch "Blob war" {:owner :player-1 })
 
 ;; Haze command
 ;;  Startup: /usr/bin/lein update-in :dependencies conj \[nrepl/nrepl\ \"1.0.0\"\] -- update-in :dependencies conj \[refactor-nrepl/refactor-nrepl\ \"3.9.0\"\] -- update-in :plugins conj \[refactor-nrepl/refactor-nrepl\ \"3.9.0\"\] -- update-in :plugins conj \[cider/cider-nrepl\ \"0.40.0\"\] -- repl :headless :host localhost
@@ -287,3 +298,5 @@
 
 ;; Was able to reproduce the exact same issue with the later cider versions
 ;; on the windows machine as well
+
+(create-sketch "Blob war" {:owner :player-1 })

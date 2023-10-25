@@ -28,10 +28,13 @@
 
 
 (defn get-entities
+  "Returns all entities matching spec as a list, merges in value of key as :id keyword"
   [state
    spec]
-  (let [entities (-> state :entity :entities vals)]
-    (filter #(s/valid? spec %) entities)))
+  (let [entities (-> state :entity :entities)]
+    (->> entities 
+         (filter #(s/valid? spec (val %)))
+         (map #(assoc (val %) :id (key %) )))))
 
 (defn apply-fn-on
   "applies fn over set of entities if spec matches, returns new state with fn applied over all entities with matching spec"

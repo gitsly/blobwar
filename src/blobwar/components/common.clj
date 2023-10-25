@@ -31,6 +31,7 @@
 ;; and a translation  'component'.
 (s/def ::moving (s/keys :req-un [:c/movement :c/translation]))
 
+(s/def ::translated (s/keys :req-un [:c/translation]))
 
 ;; Test Sample movement component
 ;;(s/valid? ::movement {:velocity [100 200]
