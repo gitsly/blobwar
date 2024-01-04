@@ -52,17 +52,33 @@
     ;; TODO: also check ownership of selectable
     (assoc entity :selected selected)))
 
+(defn deselect
+  [entity
+   event]
+  ;; TODO: also check ownership of selectable
+  (assoc entity :selected false))
+
 
 (defn on-box-selection
   [state
    event]
-  ;;  (println "selection: " event)
+  (println "deselect all entities: " event)
   (-> state
       (eu/apply-fn-on ::c/selectable #(select % event))))
+
+(defn on-no-selection
+  "Deselect all entities"
+  [state
+   event]
+  (println "deselect: " event)
+  (-> state
+      (eu/apply-fn-on ::c/selectable #(deselect % event))))
 
 (defn- system-fn
   [state]
   (-> state
+      (events/handle :no-selection
+                     #(on-no-selection state %))
       (events/handle :box-selection
                      #(on-box-selection state %))))
 

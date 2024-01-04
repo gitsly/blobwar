@@ -47,6 +47,8 @@
 ;;     (if-do false inc)
 ;;     (if-do true #(println "fn taking in " % " returning nil"))
 ;;     (if-do true dec))
+
+;; TODO: move to utils etc
 (defn if-do
   "If pred evals true apply fn over state, otherwise return state.
   Also if do-fn would return nil, then return supplied state instead"

@@ -289,4 +289,4 @@ setup-parameters))
   (println "In the absence of parantheses, chaos prevails")
   (create-sketch "Blob war" {:owner :player-1 }))
 
-;; (-main) ; Uncomment and run when having used :headless REPL and cider-connect
+(-main) ; Uncomment and run when having used :headless REPL and cider-connect

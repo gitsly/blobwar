@@ -1,3 +1,9 @@
+;; Responsibilities: Handle control inputs and send
+;; needed events to other systems like:
+;; - selection -> selects entities
+;; Separation of concert, doesn't directly affect the entities state
+;; but rather sends events out for other systems to process.
+
 (ns blobwar.systems.playercontrol
   (:require
    [blobwar.ecs.EcsSystem :as ecs]
@@ -66,22 +72,32 @@
 
 
 
-    (if (= (:button event) :left) 
-      (-> state 
-          ;; If having entities selected, then give 'command'
-          (events/if-do (not no-selection?)
-                        #(events/post-event % {:id :command
-                                               :target (v/vector px py)
-                                               :action :move
-                                               :owner (:owner state)
-                                               :entities (keys selected-entity-kvs)}))
+    (cond (= (:button event) :left) 
+          (-> state 
+              ;; If having entities selected, then give 'command'
+              (events/if-do (not no-selection?)
+                            #(events/post-event % {:id :command
+                                                   :target (v/vector px py)
+                                                   :action :move
+                                                   :owner (:owner state)
+                                                   :entities (keys selected-entity-kvs)}))
 
-          ;; DEBUG: otherwise, spawn a blob...
-          ;; (if none selected)
-          (events/if-do no-selection?
-                        #(events/post-event % {:id :spawn-blob
-                                               :owner (:owner state) :x px :y py }))
-          ))
+              ;; DEBUG: otherwise, spawn a blob...
+              ;; (if none selected)
+              (events/if-do no-selection?
+                            #(events/post-event % {:id :spawn-blob
+                                                   :owner (:owner state) :x px :y py }))
+              )
+          
+          (= (:button event) :right) ; Post a no select eventa (Desellact all entities)
+          (-> state
+              (events/if-do (not no-selection?)
+                            #(events/post-event % {:id :no-selection
+                                                   :owner (:owner state)
+                                                   :entities (keys selected-entity-kvs)})))
+
+          
+          )
     )
   )
 
