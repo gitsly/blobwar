@@ -29,6 +29,22 @@ One can start the repl in headless mode
 Then connect to it in emacs using: cider-connect
 Once in REPL, manually call -main method to start the app.
 
+## Game play ideas
+### how to get units
+Mobilization:
+  specify params for mobilization
+  - Frequency
+  - Quantity
+  - Training time
+
+  Outputs:
+  - Skill of units
+  - Morale
+  - Quantity 
+
+These params can be adjusted  (by sliders etc)
+and units should spawn accordingly.
+
 ## License
 Copyright © 2023 Martin Collberg
-Distributed under the Eclipse Public License either version 2.0
+Distributed under the Eclipse Public License version 2.0
