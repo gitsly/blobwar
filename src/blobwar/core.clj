@@ -6,6 +6,7 @@
 
    ;; https://landofquil.clojureverse.org/
    [quil.core :as q]
+   [quil.applet :as qa]
    [quil.middleware :as m]
 
    [clj-time [core :as t]]
@@ -299,4 +300,9 @@ setup-parameters))
 ;; Was able to reproduce the exact same issue with the later cider versions
 ;; on the windows machine as well
 
-(create-sketch "Blob war" {:owner :player-1 })
+(println "Create sketch")
+(qa/current-applet)
+
+(def main-applet (atom (create-sketch "Blob war" {:owner :player-1 })))
+
+(println @main-applet)
