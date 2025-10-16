@@ -123,13 +123,13 @@
                  :angle 0 }})
 
 (defn setup
-[setup-parameters]
-(q/frame-rate 60)
-(q/color-mode :rgb)
-(q/text-font (q/create-font "Hack" 12 true))
-(merge 
-start-state
-setup-parameters))
+  [setup-parameters]
+  (q/frame-rate 60)
+  (q/color-mode :rgb)
+  (q/text-font (q/create-font "Hack" 12 true))
+  (merge 
+   start-state
+   setup-parameters))
 
 
 (defn update-circle
@@ -213,8 +213,9 @@ setup-parameters))
 
 (defn draw-state [state]
   (q/background 240)
+  (println "apa")
   (do-systems state (:systems state) ecs/draw-sys)
-;;  (draw-circle (:circle-anim state))
+  ;;  (draw-circle (:circle-anim state))
 
   )
 
@@ -256,10 +257,10 @@ setup-parameters))
   (q/sketch  
    :size [640 480]
    :title title
-   :renderer :opengl ; font drawing does not work, but crisper graphics
-   ;;   :renderer :java2d ; a little blurrier , but able to draw texts 
+   ;;:renderer :opengl ; font drawing does not work, but crisper graphics
+   :renderer :java2d ; a little blurrier , but able to draw texts 
 
-                                        ; setup function called only once, during sketch initialization.
+   ;; setup function called only once, during sketch initialization.
    :setup (fn [] (setup setup-parameters))
 
    :update (fn [state] (update-state state))
@@ -286,15 +287,18 @@ setup-parameters))
                 ]))
 
 
-;; update navigation middleware to get matrix, or calculate it
+
+(defn quit
+  []
+  (when @main-sketch
+    (.exit @main-sketch)))
 
 (defn -main
   "Main entry point"
   [& args]
   (println "In the absence of parantheses, chaos prevails")
-  (when @main-sketch
-    (.exit @main-sketch))
   (reset! main-sketch 
           (create-sketch "Blob war" {:owner :player-1 })))
+
 
 ;; (-main) ; Uncomment and run when having used :headless REPL and cider-connect

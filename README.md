@@ -40,10 +40,15 @@ Mobilization:
   Outputs:
   - Skill of units
   - Morale
-  - Quantity 
+  - Quantity
 
 These params can be adjusted  (by sliders etc)
 and units should spawn accordingly.
+
+## TODO:
+
+## 
+
 
 ## License
 Copyright © 2023 Martin Collberg
