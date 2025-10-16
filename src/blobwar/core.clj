@@ -56,7 +56,9 @@
 ;; * Save state into JSON, load state...
 ;; *
 
-(def gamestate (atom {}))
+
+(def main-sketch (atom nil)) ;; holds the main quil sketch (window)
+(def gamestate (atom {})) ;; Holds the gamestate (that becomes updated every game cycle)
 ;;(zp/zprint @gamestate)
 
 ;;(->> (json/read-str (slurp "c:\\tmp\\signals.json") :key-fn keyword)
@@ -212,7 +214,9 @@ setup-parameters))
 (defn draw-state [state]
   (q/background 240)
   (do-systems state (:systems state) ecs/draw-sys)
-  (draw-circle (:circle-anim state)))
+;;  (draw-circle (:circle-anim state))
+
+  )
 
 
 (defn- mouse-dragged
@@ -252,8 +256,9 @@ setup-parameters))
   (q/sketch  
    :size [640 480]
    :title title
-   ;;:renderer :opengl ; font drawing does not work, but crisper graphics
-   :renderer :java2d ; a little blurrier 
+   :renderer :opengl ; font drawing does not work, but crisper graphics
+   ;;   :renderer :java2d ; a little blurrier , but able to draw texts 
+
                                         ; setup function called only once, during sketch initialization.
    :setup (fn [] (setup setup-parameters))
 
@@ -287,6 +292,9 @@ setup-parameters))
   "Main entry point"
   [& args]
   (println "In the absence of parantheses, chaos prevails")
-  (create-sketch "Blob war" {:owner :player-1 }))
+  (when @main-sketch
+    (.exit @main-sketch))
+  (reset! main-sketch 
+          (create-sketch "Blob war" {:owner :player-1 })))
 
-(-main) ; Uncomment and run when having used :headless REPL and cider-connect
+;; (-main) ; Uncomment and run when having used :headless REPL and cider-connect

@@ -15,15 +15,21 @@
 
         ;;        state (select-keys state [:entities]) ; filter which root keys of state to dbg
 
+        state (->> state 
+                   :entity
+                   :entities
+                   first)
+        
         ;; state (map (fn[[key entity]]
         ;;              {:name (str (:name entity) "[" key "]")
         ;;               :commands (count (:commands entity))
         ;;               :selected (:selected entity)})  (-> state :entity :entities))
-        state (map (fn[[key entity]]
-                     {:name (str (:name entity) "[" key "]")
-                      :distance (:distance entity)
-                      :translation (:translation entity)
-                      :movement (:movement entity)})  (-> state :entity :entities))
+
+        ;;        state (map (fn[[key entity]]
+        ;;                     {:name (str (:name entity) "[" key "]")
+        ;;                      :distance (:distance entity)
+        ;;                      :translation (:translation entity)
+        ;;                      :movement (:movement entity)})  (-> state :entity :entities))
 
         text-content (zp/zprint-str
                       state
@@ -40,7 +46,9 @@
 
     (q/fill [255 0 0])
     (q/text quick-dbg-str 10 240)
-    (q/pop-matrix)))
+    (q/pop-matrix))
+
+  )
 
 (defrecord Sys[definition]
   ecs/EcsSystem ; Realizes the EcsSystem protocol
